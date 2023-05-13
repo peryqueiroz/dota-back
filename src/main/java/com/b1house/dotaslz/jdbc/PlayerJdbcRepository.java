@@ -29,7 +29,7 @@ public class PlayerJdbcRepository implements PlayerRepository {
         return namedParameterJdbcTemplate.query(query, (rs, rowNum) -> {
             Player player = new Player();
             player.setId(rs.getInt("id"));
-            player.setIdDota(rs.getInt("id_dota"));
+            player.setIdDota(rs.getString("id_dota"));
             player.setNome(rs.getString("nome"));
             player.setNick(rs.getString("nick"));
             return player;
@@ -46,7 +46,7 @@ public class PlayerJdbcRepository implements PlayerRepository {
             try {
                 return new Player(
                     rs.getInt("id"),
-                    rs.getInt("id_dota"),
+                    rs.getString("id_dota"),
                     rs.getString("nome"),
                     rs.getString("nick")
 

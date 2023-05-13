@@ -5,19 +5,34 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.relational.core.mapping.Column;
+import org.springframework.data.relational.core.mapping.MappedCollection;
+import org.springframework.data.relational.core.mapping.Table;
+
+import java.util.List;
 
 
 @Builder
-
+@Table("players")
 public class Player {
+    @Id
     private Integer id;
-    private Integer idDota;
+    @Column("id_dota")
+    private String idDota;
+    @Column("nome")
     private String nome;
+    @Column("nick")
     private String nick;
+    @MappedCollection(idColumn = "player_id", keyColumn = "id")
+    private List<Match> matches;
 
     public Player(){}
 
-    public Player(Integer id, Integer idDota, String nome, String nick) {
+    public Player(Integer id){
+        this.id = id;
+    }
+    public Player(Integer id, String idDota, String nome, String nick) {
         this.id = id;
         this.idDota = idDota;
         this.nome = nome;
@@ -31,11 +46,11 @@ public class Player {
         this.id = id;
     }
 
-    public Integer getIdDota() {
+    public String getIdDota() {
         return idDota;
     }
 
-    public void setIdDota(Integer idDota) {
+    public void setIdDota(String idDota) {
         this.idDota = idDota;
     }
 
