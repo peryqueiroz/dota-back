@@ -19,10 +19,10 @@ public class MatchController {
         this.matchService = matchService;
     }
 
-    @GetMapping("/{idDota}")
-    ResponseEntity<Match> getMatchByIdDota(@PathVariable String idDota){
-        return ResponseEntity.ok(matchService.getMatchByIdDota(idDota));
-    }
+//    @GetMapping("/{idDota}")
+//    ResponseEntity<Match> getMatchByIdDota(@PathVariable String idDota){
+//        return ResponseEntity.ok(matchService.getMatchByIdDota(idDota));
+//    }
 
     @GetMapping("/recent")
     ResponseEntity<List<Match>> getRecentMatchesByAllPlayers(){

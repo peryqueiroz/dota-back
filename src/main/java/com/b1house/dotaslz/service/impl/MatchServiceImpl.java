@@ -20,8 +20,8 @@ public class MatchServiceImpl implements MatchService {
         this.playerService = playerService;
     }
     @Override
-    public Match getMatchByIdDota(String idDota) {
-        return matchRepository.findMatchByIdDota(idDota);
+    public Match getMatchByIdDota(Player player, String idDota) {
+        return matchRepository.findMatchByIdDota(player, idDota);
     }
 
     @Override
@@ -29,5 +29,10 @@ public class MatchServiceImpl implements MatchService {
         List<Player> players = playerService.getAllPlayers();
 
         return players.stream().map(player -> matchRepository.findRecentMatchByPlayer(player.getId())).toList();
+    }
+
+    @Override
+    public void saveMatch(Match match) {
+        matchRepository.saveMatch(match);
     }
 }

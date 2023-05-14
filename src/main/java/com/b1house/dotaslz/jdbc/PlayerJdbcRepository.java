@@ -1,5 +1,6 @@
 package com.b1house.dotaslz.jdbc;
 
+import com.b1house.dotaslz.model.Match;
 import com.b1house.dotaslz.model.Player;
 import com.b1house.dotaslz.repository.PlayerRepository;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -7,6 +8,7 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Component;
 
 import java.sql.ResultSet;
+import java.sql.Timestamp;
 import java.util.List;
 import java.util.function.BiFunction;
 
@@ -19,7 +21,7 @@ public class PlayerJdbcRepository implements PlayerRepository {
     }
 
     final String FIND_ALL_PLAYER = """
-        SELECT * FROM players
+        SELECT * FROM players 
         """;
 
     @Override
@@ -37,8 +39,21 @@ public class PlayerJdbcRepository implements PlayerRepository {
     }
 
     @Override
-    public Player findPlayerByIdDota() {
-        return null;
+    public Player findPlayerById(Integer id) {
+        String query = FIND_ALL_PLAYER;
+        query += " WHERE id = :id ";
+        MapSqlParameterSource parameter = new MapSqlParameterSource();
+        parameter.addValue("id", id);
+
+        return namedParameterJdbcTemplate.queryForObject(query, parameter,(rs, rowNum) -> {
+            Player player = new Player();
+            player.setId(rs.getInt("id"));
+            player.setIdDota(rs.getString("id_dota"));
+            player.setNome(rs.getString("nome"));
+            player.setNick(rs.getString("nick"));
+
+            return player;
+        });
     }
 
     private BiFunction<ResultSet, Integer, Player> result() {

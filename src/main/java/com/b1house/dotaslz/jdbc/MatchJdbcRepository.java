@@ -25,15 +25,23 @@ public class MatchJdbcRepository implements MatchRepository {
         INNER JOIN players p on m.player_id = p.id 
         """;
 
+    final String INSERT_MATCH = """
+        INSERT INTO matches (id_dota, player_id, kills, deaths, assists, hero_id, date)
+        VALUES (:id_dota, :player_id, :kills, :deaths, :assists, :hero_id, :date)
+        """;
+
     @Override
-    public Match findMatchByIdDota(String idDota) {
+    public Match findMatchByIdDota(Player player, String idDota) {
         String query = FIND_MATCH;
-        query += " WHERE m.id_dota = :id_dota";
+        query += " WHERE m.id_dota = :id_dota AND p.id = :player_id";
 
         MapSqlParameterSource parameter = new MapSqlParameterSource();
         parameter.addValue("id_dota", idDota);
+        parameter.addValue("player_id", player.getId());
 
-        return result(query, parameter);
+        Match match = result(query, parameter);
+        System.out.println("MatchFindById: "+ match.getId());
+        return match;
     }
 
     @Override
@@ -44,6 +52,22 @@ public class MatchJdbcRepository implements MatchRepository {
         parameter.addValue("player_id", playerId);
 
         return result(query, parameter);
+    }
+
+    @Override
+    public void saveMatch(Match match) {
+        String query = INSERT_MATCH;
+        MapSqlParameterSource parameter = new MapSqlParameterSource();
+
+        parameter.addValue("id_dota",match.getIdDota());
+        parameter.addValue("player_id",match.getPlayer().getId());
+        parameter.addValue("kills",match.getKills());
+        parameter.addValue("deaths",match.getDeaths());
+        parameter.addValue("assists",match.getAssists());
+        parameter.addValue("hero_id",match.getHeroId());
+        parameter.addValue("date",match.getDate());
+
+        namedParameterJdbcTemplate.update(query, parameter);
     }
 
     private Match result(String query, MapSqlParameterSource parameter) {
