@@ -1,6 +1,5 @@
 package com.b1house.dotaslz.model;
 
-import lombok.Data;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.MappedCollection;
@@ -19,19 +18,21 @@ public class Match {
     private Integer kills;
     private Integer deaths;
     private Integer assists;
-    private Integer heroId;
+    private String heroUrl;
     @Column("date")
     private LocalDateTime date;
+    private Boolean win;
 
-    public Match(Integer id, String idDota, Player player, Integer kills, Integer deaths, Integer assists, Integer heroId, LocalDateTime date) {
+    public Match(Integer id, String idDota, Player player, Integer kills, Integer deaths, Integer assists, String heroUrl, LocalDateTime date, Boolean win) {
         this.id = id;
         this.idDota = idDota;
         this.player = player;
         this.kills = kills;
         this.deaths = deaths;
         this.assists = assists;
-        this.heroId = heroId;
+        this.heroUrl = heroUrl;
         this.date = date;
+        this.win = win;
     }
 
     public Match() {
@@ -85,12 +86,12 @@ public class Match {
         this.assists = assists;
     }
 
-    public Integer getHeroId() {
-        return heroId;
+    public String getHeroUrl() {
+        return heroUrl;
     }
 
-    public void setHeroId(Integer heroId) {
-        this.heroId = heroId;
+    public void setHeroUrl(String heroUrl) {
+        this.heroUrl = heroUrl;
     }
 
     public LocalDateTime getDate() {
@@ -99,5 +100,13 @@ public class Match {
 
     public void setDate(LocalDateTime date) {
         this.date = date;
+    }
+
+    public Boolean getWin() {
+        return win;
+    }
+
+    public void setWin(Boolean win) {
+        this.win = win;
     }
 }

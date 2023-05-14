@@ -1,16 +1,12 @@
 package com.b1house.dotaslz.jdbc;
 
-import com.b1house.dotaslz.model.Match;
 import com.b1house.dotaslz.model.Player;
 import com.b1house.dotaslz.repository.PlayerRepository;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Component;
 
-import java.sql.ResultSet;
-import java.sql.Timestamp;
 import java.util.List;
-import java.util.function.BiFunction;
 
 @Component
 public class PlayerJdbcRepository implements PlayerRepository {
@@ -24,6 +20,16 @@ public class PlayerJdbcRepository implements PlayerRepository {
         SELECT * FROM players 
         """;
 
+    final String UPDATE_AVATAR = """
+        UPDATE players SET avatar = :avatar
+        WHERE id = :id
+        """;
+
+    final String UPDATE_NICK = """
+        UPDATE players SET nick = :nick
+        WHERE id = :id
+        """;
+
     @Override
     public List<Player> findAllPlayers() {
         String query = FIND_ALL_PLAYER;
@@ -34,6 +40,7 @@ public class PlayerJdbcRepository implements PlayerRepository {
             player.setIdDota(rs.getString("id_dota"));
             player.setNome(rs.getString("nome"));
             player.setNick(rs.getString("nick"));
+            player.setAvatar(rs.getString("avatar"));
             return player;
         });
     }
@@ -51,25 +58,30 @@ public class PlayerJdbcRepository implements PlayerRepository {
             player.setIdDota(rs.getString("id_dota"));
             player.setNome(rs.getString("nome"));
             player.setNick(rs.getString("nick"));
+            player.setAvatar(rs.getString("avatar"));
 
             return player;
         });
     }
 
-    private BiFunction<ResultSet, Integer, Player> result() {
-        return (rs, index) -> {
-            try {
-                return new Player(
-                    rs.getInt("id"),
-                    rs.getString("id_dota"),
-                    rs.getString("nome"),
-                    rs.getString("nick")
+    @Override
+    public void updateAvatar(Player player) {
+        String query = UPDATE_AVATAR;
+        MapSqlParameterSource parameter = new MapSqlParameterSource();
+        parameter.addValue("avatar", player.getAvatar());
+        parameter.addValue("id", player.getId());
 
-                );
-            } catch (Exception e) {
-                // Tratar o erro, se necessário
-                return null;
-            }
-        };
+        namedParameterJdbcTemplate.update(query,parameter);
+
+    }
+
+    @Override
+    public void updateNick(Player player) {
+        String query = UPDATE_NICK;
+        MapSqlParameterSource parameter = new MapSqlParameterSource();
+        parameter.addValue("nick", player.getNick());
+        parameter.addValue("id", player.getId());
+
+        namedParameterJdbcTemplate.update(query,parameter);
     }
 }

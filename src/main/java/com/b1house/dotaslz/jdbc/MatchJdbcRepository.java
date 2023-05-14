@@ -19,15 +19,15 @@ public class MatchJdbcRepository implements MatchRepository {
 
     final String FIND_MATCH = """
         SELECT m.id AS match_id, m.id_dota AS match_id_dota, m.kills, m.deaths, m.assists,
-        m.hero_id, m.date, p.id as player_id, p.id_dota as player_id_dota, p.nome, p.nick
+        m.hero_url, m.date, m.win, p.id as player_id, p.id_dota as player_id_dota, p.nome, p.nick, p.avatar
         
         FROM matches m
         INNER JOIN players p on m.player_id = p.id 
         """;
 
     final String INSERT_MATCH = """
-        INSERT INTO matches (id_dota, player_id, kills, deaths, assists, hero_id, date)
-        VALUES (:id_dota, :player_id, :kills, :deaths, :assists, :hero_id, :date)
+        INSERT INTO matches (id_dota, player_id, kills, deaths, assists, hero_url, date, win)
+        VALUES (:id_dota, :player_id, :kills, :deaths, :assists, :hero_url, :date, :win)
         """;
 
     @Override
@@ -64,8 +64,9 @@ public class MatchJdbcRepository implements MatchRepository {
         parameter.addValue("kills",match.getKills());
         parameter.addValue("deaths",match.getDeaths());
         parameter.addValue("assists",match.getAssists());
-        parameter.addValue("hero_id",match.getHeroId());
+        parameter.addValue("hero_url",match.getHeroUrl());
         parameter.addValue("date",match.getDate());
+        parameter.addValue("win", match.getWin());
 
         namedParameterJdbcTemplate.update(query, parameter);
     }
@@ -78,7 +79,8 @@ public class MatchJdbcRepository implements MatchRepository {
             match.setKills(rs.getInt("kills"));
             match.setAssists(rs.getInt("assists"));
             match.setDeaths(rs.getInt("deaths"));
-            match.setHeroId(rs.getInt("hero_id"));
+            match.setHeroUrl(rs.getString("hero_url"));
+            match.setWin(rs.getBoolean("win"));
 
             Timestamp timestamp = rs.getTimestamp("date");
             match.setDate(timestamp.toLocalDateTime());
@@ -88,6 +90,7 @@ public class MatchJdbcRepository implements MatchRepository {
             player.setIdDota(rs.getString("player_id_dota"));
             player.setNome(rs.getString("nome"));
             player.setNick(rs.getString("nick"));
+            player.setAvatar(rs.getString("avatar"));
             match.setPlayer(player);
 
             return match;

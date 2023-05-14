@@ -11,4 +11,7 @@ public interface PlayerService {
     List<Player> getAllPlayers();
 
     Player getPlayerById(Integer id);
+
+    void updateAvatar(Player player);
+    void updateNick(Player player);
 }

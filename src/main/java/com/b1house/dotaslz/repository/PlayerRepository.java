@@ -10,4 +10,7 @@ public interface PlayerRepository {
 
     List<Player> findAllPlayers();
     Player findPlayerById(Integer id);
+
+    void updateAvatar(Player player);
+    void updateNick(Player player);
 }

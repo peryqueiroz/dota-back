@@ -23,4 +23,14 @@ public class PlayerServiceImpl implements PlayerService {
     public Player getPlayerById(Integer id) {
         return playerRepository.findPlayerById(id);
     }
+
+    @Override
+    public void updateAvatar(Player player) {
+        playerRepository.updateAvatar(player);
+    }
+
+    @Override
+    public void updateNick(Player player) {
+        playerRepository.updateNick(player);
+    }
 }

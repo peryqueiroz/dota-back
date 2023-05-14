@@ -24,6 +24,8 @@ public class Player {
     private String nome;
     @Column("nick")
     private String nick;
+    @Column("avatar")
+    private String avatar;
     @MappedCollection(idColumn = "player_id", keyColumn = "id")
     private List<Match> matches;
 
@@ -32,11 +34,12 @@ public class Player {
     public Player(Integer id){
         this.id = id;
     }
-    public Player(Integer id, String idDota, String nome, String nick) {
+    public Player(Integer id, String idDota, String nome, String nick, String avatar) {
         this.id = id;
         this.idDota = idDota;
         this.nome = nome;
         this.nick = nick;
+        this.avatar = avatar;
     }
     public Integer getId() {
         return id;
@@ -68,6 +71,14 @@ public class Player {
 
     public void setNick(String nick) {
         this.nick = nick;
+    }
+
+    public String getAvatar() {
+        return avatar;
+    }
+
+    public void setAvatar(String avatar) {
+        this.avatar = avatar;
     }
 
 }

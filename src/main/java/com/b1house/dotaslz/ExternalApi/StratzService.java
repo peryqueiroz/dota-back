@@ -15,12 +15,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import java.net.URI;
-import java.sql.Timestamp;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 public class StratzService {
@@ -37,11 +37,19 @@ public class StratzService {
         this.playerService = playerService;
         this.matchService = matchService;
     }
-    @Scheduled(fixedRate = 15000)
+    @Scheduled(fixedRate = 30000)
     public void scheduleFetchAndSave(){
         List<Player> players = playerService.getAllPlayers();
 
-        players.forEach(this::fetchDataFromApiByPlayer);
+        players.forEach( player->{
+            fetchDataFromApiByPlayer(player);
+            fetchInfoPlayer(player);
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                System.out.println(e.getMessage());
+            }
+        });
     }
     private void fetchDataFromApiByPlayer(Player player){
         String url = "https://api.stratz.com/api/v1/Player/"+player.getIdDota()+"/matches";
@@ -67,17 +75,22 @@ public class StratzService {
             match.setKills(Integer.parseInt(firstMatch.get("numKills").toString()));
             match.setDeaths(Integer.parseInt(firstMatch.get("numDeaths").toString()));
             match.setAssists(Integer.parseInt(firstMatch.get("numAssists").toString()));
-            match.setHeroId(Integer.parseInt(firstMatch.get("heroId").toString()));
+
+            Boolean didRadiantWin = Boolean.parseBoolean(response.get(0).get("didRadiantWin").toString());
+            Boolean isRadiant = Boolean.parseBoolean(firstMatch.get("isRadiant").toString());
+            Boolean win = didRadiantWin == isRadiant;
+
+            match.setWin(win);
 
             Instant instant = Instant.ofEpochSecond(Long.parseLong(response.get(0).get("endDateTime").toString()));
-
-            System.out.println("instant "+ instant);
             ZoneId zone = ZoneId.of("GMT-3");
             LocalDateTime localDateTime = LocalDateTime.ofInstant(instant, zone);
 
-            System.out.println("localdate "+ localDateTime.toString());
-
             match.setDate(localDateTime);
+
+            String heroUrl =  getHeroUrlById(Integer.parseInt(firstMatch.get("heroId").toString()));
+            match.setHeroUrl(heroUrl);
+
 
             try{
                 matchService.saveMatch(match);
@@ -86,6 +99,57 @@ public class StratzService {
             }
         } else {
             System.out.println(matchId + " match nao é nova");
+        }
+    }
+    private String getHeroUrlById(Integer id){
+        String url = "https://api.stratz.com/api/v1/Hero";
+        String baseUrlReturn = "https://api.opendota.com/apps/dota2/images/heroes/";
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setBearerAuth(bearerToken);
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        RequestEntity<?> requestEntity = new RequestEntity<>(headers, HttpMethod.GET, URI.create(url));
+
+        ParameterizedTypeReference<HashMap> responseType = new ParameterizedTypeReference<HashMap>() {};
+        HashMap response = restTemplate.exchange(requestEntity, responseType).getBody();
+
+        HashMap<String, Object> heroMap = (HashMap<String, Object>) response.get(id.toString());
+
+        String heroName = heroMap.get("shortName").toString();
+
+        return baseUrlReturn + heroName + "_full.png";
+    }
+
+    private void fetchInfoPlayer(Player player){
+        String url = "https://api.stratz.com/api/v1/Player/"+player.getIdDota();
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setBearerAuth(bearerToken);
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        RequestEntity<?> requestEntity = new RequestEntity<>(headers, HttpMethod.GET, URI.create(url));
+
+        ParameterizedTypeReference<HashMap> responseType = new ParameterizedTypeReference<HashMap>() {};
+        HashMap response = restTemplate.exchange(requestEntity, responseType).getBody();
+
+        HashMap<String, Object> steamAccount = (HashMap<String, Object>) response.get("steamAccount");
+
+        String avatar = steamAccount.get("avatar").toString();
+        String nick = steamAccount.get("name").toString();
+
+        if(!Objects.equals(avatar, player.getAvatar())){
+            System.out.println("Updating avatar of "+ player.getNome());
+
+            player.setAvatar(avatar);
+            playerService.updateAvatar(player);
+        }
+
+        if(!Objects.equals(nick, player.getNick())){
+            System.out.println("Updating nick of "+ player.getNome());
+
+            player.setNick(nick);
+            playerService.updateNick(player);
         }
     }
 
