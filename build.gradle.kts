@@ -12,6 +12,12 @@ repositories {
 	mavenCentral()
 }
 
+//tasks.jar {
+//	manifest {
+//		attributes["Main-Class"] = "com.b1house.dotaslz.DotaslzApplication com.b1house.dotaslz.DotaslzApplication" // Substitua 'com.example.MyApplication' pelo pacote e nome da sua classe principal
+//	}
+//}
+
 dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-data-jdbc")
 	implementation("org.springframework.boot:spring-boot-starter-web")
