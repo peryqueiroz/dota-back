@@ -37,7 +37,7 @@ public class StratzService {
         this.playerService = playerService;
         this.matchService = matchService;
     }
-    @Scheduled(fixedRate = 30000)
+    @Scheduled(fixedRate = 300000)
     public void scheduleFetchAndSave(){
         List<Player> players = playerService.getAllPlayers();
 
