@@ -33,4 +33,9 @@ public class PlayerServiceImpl implements PlayerService {
     public void updateNick(Player player) {
         playerRepository.updateNick(player);
     }
+
+    @Override
+    public void updateIsPrivate(Player player) {
+        playerRepository.updateIsPrivate(player);
+    }
 }

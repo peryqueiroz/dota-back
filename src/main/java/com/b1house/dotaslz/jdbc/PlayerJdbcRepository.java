@@ -29,6 +29,10 @@ public class PlayerJdbcRepository implements PlayerRepository {
         UPDATE players SET nick = :nick
         WHERE id = :id
         """;
+    final String UPDATE_PRIVATE = """
+        UPDATE players SET is_private = :is_private
+        WHERE id = :id
+        """;
 
     @Override
     public List<Player> findAllPlayers() {
@@ -41,6 +45,10 @@ public class PlayerJdbcRepository implements PlayerRepository {
             player.setNome(rs.getString("nome"));
             player.setNick(rs.getString("nick"));
             player.setAvatar(rs.getString("avatar"));
+            player.setIsPrivate(rs.getBoolean("is_private"));
+            player.setMmr(rs.getInt("mmr"));
+            player.setIsMain(rs.getBoolean("is_main"));
+
             return player;
         });
     }
@@ -59,6 +67,9 @@ public class PlayerJdbcRepository implements PlayerRepository {
             player.setNome(rs.getString("nome"));
             player.setNick(rs.getString("nick"));
             player.setAvatar(rs.getString("avatar"));
+            player.setIsPrivate(rs.getBoolean("is_private"));
+            player.setMmr(rs.getInt("mmr"));
+            player.setIsMain(rs.getBoolean("is_main"));
 
             return player;
         });
@@ -72,7 +83,6 @@ public class PlayerJdbcRepository implements PlayerRepository {
         parameter.addValue("id", player.getId());
 
         namedParameterJdbcTemplate.update(query,parameter);
-
     }
 
     @Override
@@ -80,6 +90,16 @@ public class PlayerJdbcRepository implements PlayerRepository {
         String query = UPDATE_NICK;
         MapSqlParameterSource parameter = new MapSqlParameterSource();
         parameter.addValue("nick", player.getNick());
+        parameter.addValue("id", player.getId());
+
+        namedParameterJdbcTemplate.update(query,parameter);
+    }
+
+    @Override
+    public void updateIsPrivate(Player player) {
+        String query = UPDATE_PRIVATE;
+        MapSqlParameterSource parameter = new MapSqlParameterSource();
+        parameter.addValue("is_private", player.getIsPrivate());
         parameter.addValue("id", player.getId());
 
         namedParameterJdbcTemplate.update(query,parameter);

@@ -22,8 +22,10 @@ public class Match {
     @Column("date")
     private LocalDateTime date;
     private Boolean win;
+    @Column("is_party")
+    private Boolean isParty;
 
-    public Match(Integer id, String idDota, Player player, Integer kills, Integer deaths, Integer assists, String heroUrl, LocalDateTime date, Boolean win) {
+    public Match(Integer id, String idDota, Player player, Integer kills, Integer deaths, Integer assists, String heroUrl, LocalDateTime date, Boolean win, Boolean isParty) {
         this.id = id;
         this.idDota = idDota;
         this.player = player;
@@ -33,6 +35,7 @@ public class Match {
         this.heroUrl = heroUrl;
         this.date = date;
         this.win = win;
+        this.isParty = isParty;
     }
 
     public Match() {
@@ -108,5 +111,13 @@ public class Match {
 
     public void setWin(Boolean win) {
         this.win = win;
+    }
+
+    public Boolean getIsParty() {
+        return isParty;
+    }
+
+    public void setIsParty(Boolean isParty) {
+        this.isParty = isParty;
     }
 }

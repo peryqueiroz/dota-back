@@ -19,15 +19,15 @@ public class MatchJdbcRepository implements MatchRepository {
 
     final String FIND_MATCH = """
         SELECT m.id AS match_id, m.id_dota AS match_id_dota, m.kills, m.deaths, m.assists,
-        m.hero_url, m.date, m.win, p.id as player_id, p.id_dota as player_id_dota, p.nome, p.nick, p.avatar
+        m.hero_url, m.date, m.win, m.is_party, p.id as player_id, p.id_dota as player_id_dota, p.nome, p.nick, p.avatar, p.is_private
         
         FROM matches m
         INNER JOIN players p on m.player_id = p.id 
         """;
 
     final String INSERT_MATCH = """
-        INSERT INTO matches (id_dota, player_id, kills, deaths, assists, hero_url, date, win)
-        VALUES (:id_dota, :player_id, :kills, :deaths, :assists, :hero_url, :date, :win)
+        INSERT INTO matches (id_dota, player_id, kills, deaths, assists, hero_url, date, win, is_party)
+        VALUES (:id_dota, :player_id, :kills, :deaths, :assists, :hero_url, :date, :win, :is_party)
         """;
 
     @Override
@@ -39,9 +39,7 @@ public class MatchJdbcRepository implements MatchRepository {
         parameter.addValue("id_dota", idDota);
         parameter.addValue("player_id", player.getId());
 
-        Match match = result(query, parameter);
-        System.out.println("MatchFindById: "+ match.getId());
-        return match;
+        return result(query, parameter);
     }
 
     @Override
@@ -67,6 +65,7 @@ public class MatchJdbcRepository implements MatchRepository {
         parameter.addValue("hero_url",match.getHeroUrl());
         parameter.addValue("date",match.getDate());
         parameter.addValue("win", match.getWin());
+        parameter.addValue("is_party", match.getIsParty());
 
         namedParameterJdbcTemplate.update(query, parameter);
     }
@@ -81,6 +80,7 @@ public class MatchJdbcRepository implements MatchRepository {
             match.setDeaths(rs.getInt("deaths"));
             match.setHeroUrl(rs.getString("hero_url"));
             match.setWin(rs.getBoolean("win"));
+            match.setIsParty(rs.getBoolean("is_party"));
 
             Timestamp timestamp = rs.getTimestamp("date");
             match.setDate(timestamp.toLocalDateTime());
@@ -91,6 +91,7 @@ public class MatchJdbcRepository implements MatchRepository {
             player.setNome(rs.getString("nome"));
             player.setNick(rs.getString("nick"));
             player.setAvatar(rs.getString("avatar"));
+            player.setIsPrivate(rs.getBoolean("is_private"));
             match.setPlayer(player);
 
             return match;

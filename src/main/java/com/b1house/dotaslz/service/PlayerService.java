@@ -14,4 +14,5 @@ public interface PlayerService {
 
     void updateAvatar(Player player);
     void updateNick(Player player);
+    void updateIsPrivate(Player player);
 }

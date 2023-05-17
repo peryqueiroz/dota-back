@@ -1,9 +1,12 @@
 package com.b1house.dotaslz.ExternalApi;
 
+import com.b1house.dotaslz.enums.GameMode;
 import com.b1house.dotaslz.model.Match;
 import com.b1house.dotaslz.model.Player;
+import com.b1house.dotaslz.model.Season;
 import com.b1house.dotaslz.service.MatchService;
 import com.b1house.dotaslz.service.PlayerService;
+import com.b1house.dotaslz.service.SeasonService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpHeaders;
@@ -29,21 +32,22 @@ public class StratzService {
     private final String bearerToken;
     private final PlayerService playerService;
     private final MatchService matchService;
+    private final SeasonService seasonService;
 
     public StratzService(RestTemplate restTemplate, @Value("${external.api.token}") String bearerToken, PlayerService playerService,
-                         MatchService matchService) {
+                         MatchService matchService, SeasonService seasonService) {
         this.restTemplate = restTemplate;
         this.bearerToken = bearerToken;
         this.playerService = playerService;
         this.matchService = matchService;
+        this.seasonService = seasonService;
     }
     @Scheduled(fixedRate = 300000)
-    public void scheduleFetchAndSave(){
+    public void scheduleFetchAndSaveNewMatches(){
         List<Player> players = playerService.getAllPlayers();
 
         players.forEach( player->{
             fetchDataFromApiByPlayer(player);
-            fetchInfoPlayer(player);
             try {
                 Thread.sleep(1000);
             } catch (InterruptedException e) {
@@ -51,55 +55,104 @@ public class StratzService {
             }
         });
     }
-    private void fetchDataFromApiByPlayer(Player player){
-        String url = "https://api.stratz.com/api/v1/Player/"+player.getIdDota()+"/matches";
+    @Scheduled(fixedRate = 1860000)
+    public void scheduleFetchAndSaveInfoPlayers(){
+        System.out.println("Starting to fetch info players...");
+        List<Player> players = playerService.getAllPlayers();
 
-        HttpHeaders headers = new HttpHeaders();
-        headers.setBearerAuth(bearerToken);
-        headers.setContentType(MediaType.APPLICATION_JSON);
-
-        RequestEntity<?> requestEntity = new RequestEntity<>(headers, HttpMethod.GET, URI.create(url));
-
-        ParameterizedTypeReference<List<HashMap>> responseType = new ParameterizedTypeReference<List<HashMap>>() {};
-        List<HashMap> response = restTemplate.exchange(requestEntity, responseType).getBody();
-
-        String matchId = response.get(0).get("id").toString();
-
-        if(isNewMatch(player, matchId)){
-            Match match = new Match();
-            match.setIdDota(response.get(0).get("id").toString());
-            match.setPlayer(player);
-            List playersList =  (List) response.get(0).get("players");
-            HashMap<String, Object> firstMatch = (HashMap<String, Object>) playersList.get(0);
-
-            match.setKills(Integer.parseInt(firstMatch.get("numKills").toString()));
-            match.setDeaths(Integer.parseInt(firstMatch.get("numDeaths").toString()));
-            match.setAssists(Integer.parseInt(firstMatch.get("numAssists").toString()));
-
-            Boolean didRadiantWin = Boolean.parseBoolean(response.get(0).get("didRadiantWin").toString());
-            Boolean isRadiant = Boolean.parseBoolean(firstMatch.get("isRadiant").toString());
-            Boolean win = didRadiantWin == isRadiant;
-
-            match.setWin(win);
-
-            Instant instant = Instant.ofEpochSecond(Long.parseLong(response.get(0).get("endDateTime").toString()));
-            ZoneId zone = ZoneId.of("GMT-3");
-            LocalDateTime localDateTime = LocalDateTime.ofInstant(instant, zone);
-
-            match.setDate(localDateTime);
-
-            String heroUrl =  getHeroUrlById(Integer.parseInt(firstMatch.get("heroId").toString()));
-            match.setHeroUrl(heroUrl);
-
-
-            try{
-                matchService.saveMatch(match);
-            } catch (Exception e){
+        players.forEach( player->{
+            fetchInfoPlayer(player);
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
                 System.out.println(e.getMessage());
             }
-        } else {
-            System.out.println(matchId + " match nao é nova");
+        });
+
+        System.out.println("Ended fetch info");
+    }
+    private void fetchDataFromApiByPlayer(Player player){
+        try {
+            String url = "https://api.stratz.com/api/v1/Player/" + player.getIdDota() + "/matches";
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.setBearerAuth(bearerToken);
+            headers.setContentType(MediaType.APPLICATION_JSON);
+
+            RequestEntity<?> requestEntity = new RequestEntity<>(headers, HttpMethod.GET, URI.create(url));
+            ParameterizedTypeReference<List<HashMap>> responseType = new ParameterizedTypeReference<List<HashMap>>() {
+            };
+            List<HashMap> response = restTemplate.exchange(requestEntity, responseType).getBody();
+
+            String matchId = response.get(0).get("id").toString();
+
+            if (isNewMatch(player, matchId)) {
+
+                System.out.println(player.getNome() +" has a new match - "+ matchId);
+                Match match = fillMatchFromApiResponse(response, player);
+                Season season = getSeasonActivated();
+
+                if(season.getId() != null && player.getIsMain()){
+                    System.out.println("Match on Season " + season.getVersion() + " detected..");
+                    System.out.println("Player: " + player.getNome());
+                    System.out.println("Match: " + match.getIdDota());
+                    updateScorePlayer(player, match, season);
+                }
+                saveMatch(match);
+
+            } else {
+                System.out.println(matchId + " match nao é nova");
+            }
+        } catch (Exception e){
+            if(e.getMessage().contains("403") && !player.getIsPrivate()){
+                player.setIsPrivate(true);
+                playerService.updateIsPrivate(player);
+            }
+            System.out.println("Player: " + player.getNome());
+            System.out.println("Error: " + e.getMessage());
         }
+    }
+    private void saveMatch(Match match){
+        try {
+            matchService.saveMatch(match);
+        } catch (Exception e) {
+            System.out.println("Error saving a match");
+            System.out.println(e.getMessage());
+        }
+    }
+    private Match fillMatchFromApiResponse(List<HashMap> response, Player player){
+        Match match = new Match();
+
+        match.setIdDota(response.get(0).get("id").toString());
+        match.setPlayer(player);
+        List playersList = (List) response.get(0).get("players");
+        HashMap<String, Object> firstMatch = (HashMap<String, Object>) playersList.get(0);
+
+        match.setKills(Integer.parseInt(firstMatch.get("numKills").toString()));
+        match.setDeaths(Integer.parseInt(firstMatch.get("numDeaths").toString()));
+        match.setAssists(Integer.parseInt(firstMatch.get("numAssists").toString()));
+
+        Boolean didRadiantWin = Boolean.parseBoolean(response.get(0).get("didRadiantWin").toString());
+        Boolean isRadiant = Boolean.parseBoolean(firstMatch.get("isRadiant").toString());
+        Boolean win = didRadiantWin == isRadiant;
+        match.setWin(win);
+
+        Instant instant = Instant.ofEpochSecond(Long.parseLong(response.get(0).get("endDateTime").toString()));
+        ZoneId zone = ZoneId.of("GMT-3");
+        LocalDateTime localDateTime = LocalDateTime.ofInstant(instant, zone);
+        match.setDate(localDateTime);
+
+        Boolean isParty = firstMatch.containsKey("partyId");
+        match.setIsParty(isParty);
+
+        try{
+            String heroUrl = getHeroUrlById(Integer.parseInt(firstMatch.get("heroId").toString()));
+            match.setHeroUrl(heroUrl);
+        } catch (Exception e){
+            System.out.println("Error getting heroUrl from API");
+        }
+
+        return match;
     }
     private String getHeroUrlById(Integer id){
         String url = "https://api.stratz.com/api/v1/Hero";
@@ -137,6 +190,7 @@ public class StratzService {
 
         String avatar = steamAccount.get("avatar").toString();
         String nick = steamAccount.get("name").toString();
+        Boolean playerIsPrivate = Boolean.parseBoolean(steamAccount.get("isAnonymous").toString());
 
         if(!Objects.equals(avatar, player.getAvatar())){
             System.out.println("Updating avatar of "+ player.getNome());
@@ -151,19 +205,35 @@ public class StratzService {
             player.setNick(nick);
             playerService.updateNick(player);
         }
+
+        if(playerIsPrivate != player.getIsPrivate()){
+            System.out.println("Updating isPrivate of "+player.getNome() +" from "+ player.getIsPrivate().toString() +" to "+
+                playerIsPrivate);
+
+            player.setIsPrivate(playerIsPrivate);
+            playerService.updateIsPrivate(player);
+        }
     }
 
     private Boolean isNewMatch(Player player, String matchId){
         try{
-            System.out.println("isNewMatch "+player.getNome() +" - "+ matchId);
             Match match = matchService.getMatchByIdDota(player, matchId);
-            System.out.println("isNewMAtchDepois");
             return match.getId() == null;
         }
         catch (Exception e){
-            System.out.println("match is newMatch");
+            System.out.println("Error finding new match from id_dota");
             System.out.println(e.getMessage());
             return true;
         }
+    }
+    private Season getSeasonActivated(){
+        return seasonService.getSeasonActivated();
+    }
+
+    private void updateScorePlayer(Player player, Match match, Season season){
+        GameMode gameMode = match.getIsParty() ? GameMode.PARTY : GameMode.SOLO;
+        Integer scoreFinal = match.getWin() ? gameMode.getScore() : (gameMode.getScore() * -1);
+
+        seasonService.saveScoreSeasonPlayer(player,season,match,scoreFinal);
     }
 }
