@@ -11,5 +11,5 @@ public interface MatchService {
 
     List<Match> getRecentMatchesByAllPlayers();
 
-    void saveMatch(Match match);
+    Integer saveMatch(Match match);
 }

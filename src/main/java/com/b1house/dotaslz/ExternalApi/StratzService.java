@@ -9,6 +9,7 @@ import com.b1house.dotaslz.service.PlayerService;
 import com.b1house.dotaslz.service.SeasonService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
@@ -92,16 +93,16 @@ public class StratzService {
                 Match match = fillMatchFromApiResponse(response, player);
                 Season season = getSeasonActivated();
 
+                Integer matchIdSaved = saveMatch(match);
+                match.setId(matchIdSaved);
+
                 if(season.getId() != null && player.getIsMain()){
-                    System.out.println("Match on Season " + season.getVersion() + " detected..");
-                    System.out.println("Player: " + player.getNome());
-                    System.out.println("Match: " + match.getIdDota());
+                    System.out.println(match.getIsParty()? "Party ":"Solo " + "match "+ match.getIdDota()+"of " +player.getNome()+" on Season " + season.getVersion() + " detected..");
+                    System.out.print("Result - ");
+                    System.out.println(match.getWin()? "Win" : "Loss");
+
                     updateScorePlayer(player, match, season);
                 }
-                saveMatch(match);
-
-            } else {
-                System.out.println(matchId + " match nao é nova");
             }
         } catch (Exception e){
             if(e.getMessage().contains("403") && !player.getIsPrivate()){
@@ -112,12 +113,12 @@ public class StratzService {
             System.out.println("Error: " + e.getMessage());
         }
     }
-    private void saveMatch(Match match){
+    private Integer saveMatch(Match match){
         try {
-            matchService.saveMatch(match);
+            return matchService.saveMatch(match);
         } catch (Exception e) {
-            System.out.println("Error saving a match");
             System.out.println(e.getMessage());
+            throw new RuntimeException("Error saving a match "+match.getIdDota()+" of "+ match.getPlayer().getNome());
         }
     }
     private Match fillMatchFromApiResponse(List<HashMap> response, Player player){
@@ -220,9 +221,13 @@ public class StratzService {
             Match match = matchService.getMatchByIdDota(player, matchId);
             return match.getId() == null;
         }
-        catch (Exception e){
-            System.out.println("Error finding new match from id_dota");
-            System.out.println(e.getMessage());
+        catch (IncorrectResultSizeDataAccessException e){
+            if(e.getActualSize() > 0) {
+                System.out.println("Error finding new match..");
+                System.out.println("Player: "+ player.getNome());
+                System.out.println("Match: "+ matchId);
+                System.out.println(e.getMessage());
+            }
             return true;
         }
     }

@@ -5,6 +5,7 @@ import com.b1house.dotaslz.model.Player;
 import com.b1house.dotaslz.repository.MatchRepository;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.stereotype.Component;
 
 import java.sql.Timestamp;
@@ -53,21 +54,14 @@ public class MatchJdbcRepository implements MatchRepository {
     }
 
     @Override
-    public void saveMatch(Match match) {
+    public Integer saveMatch(Match match) {
         String query = INSERT_MATCH;
         MapSqlParameterSource parameter = new MapSqlParameterSource();
+        GeneratedKeyHolder generatedKeyHolder = new GeneratedKeyHolder();
 
-        parameter.addValue("id_dota",match.getIdDota());
-        parameter.addValue("player_id",match.getPlayer().getId());
-        parameter.addValue("kills",match.getKills());
-        parameter.addValue("deaths",match.getDeaths());
-        parameter.addValue("assists",match.getAssists());
-        parameter.addValue("hero_url",match.getHeroUrl());
-        parameter.addValue("date",match.getDate());
-        parameter.addValue("win", match.getWin());
-        parameter.addValue("is_party", match.getIsParty());
+        namedParameterJdbcTemplate.update(query, parameter, generatedKeyHolder);
 
-        namedParameterJdbcTemplate.update(query, parameter);
+        return generatedKeyHolder.getKey().intValue();
     }
 
     private Match result(String query, MapSqlParameterSource parameter) {

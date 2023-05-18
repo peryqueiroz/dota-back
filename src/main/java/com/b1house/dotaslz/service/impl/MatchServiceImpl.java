@@ -11,7 +11,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class MatchServiceImpl implements MatchService {
@@ -46,7 +45,7 @@ public class MatchServiceImpl implements MatchService {
     }
 
     @Override
-    public void saveMatch(Match match) {
-        matchRepository.saveMatch(match);
+    public Integer saveMatch(Match match) {
+        return matchRepository.saveMatch(match);
     }
 }
