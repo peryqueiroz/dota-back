@@ -94,6 +94,7 @@ public class StratzService {
                 Season season = getSeasonActivated();
 
                 Integer matchIdSaved = saveMatch(match);
+//                saveMatch(match);
                 match.setId(matchIdSaved);
 
                 if(season.getId() != null && player.getIsMain()){

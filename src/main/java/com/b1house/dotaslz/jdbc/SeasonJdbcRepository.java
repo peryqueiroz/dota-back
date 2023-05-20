@@ -24,7 +24,7 @@ public class SeasonJdbcRepository implements SeasonRepository {
         """;
 
     final String INSERT_SCORE = """
-        INSERT INTO season_players (player_id, season_id, score, match_id) VALUES (:player_id, :season_id, :score, :match_id)        
+        INSERT INTO season_players (player_id, season_id, score, match_id, updated_at) VALUES (:player_id, :season_id, :score, :match_id, :updated_at)        
         """;
 
     @Override
@@ -49,6 +49,7 @@ public class SeasonJdbcRepository implements SeasonRepository {
         parameter.addValue("season_id", season.getId());
         parameter.addValue("score", score);
         parameter.addValue("match_id", match.getId());
+        parameter.addValue("updated_at", match.getDate());
 
         namedParameterJdbcTemplate.update(query,parameter);
     }

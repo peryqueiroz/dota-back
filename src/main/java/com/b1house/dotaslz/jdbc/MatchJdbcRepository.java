@@ -9,6 +9,7 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.stereotype.Component;
 
 import java.sql.Timestamp;
+import java.util.Objects;
 
 @Component
 public class MatchJdbcRepository implements MatchRepository {
@@ -59,9 +60,19 @@ public class MatchJdbcRepository implements MatchRepository {
         MapSqlParameterSource parameter = new MapSqlParameterSource();
         GeneratedKeyHolder generatedKeyHolder = new GeneratedKeyHolder();
 
-        namedParameterJdbcTemplate.update(query, parameter, generatedKeyHolder);
+        parameter.addValue("id_dota",match.getIdDota());
+        parameter.addValue("player_id",match.getPlayer().getId());
+        parameter.addValue("kills",match.getKills());
+        parameter.addValue("deaths",match.getDeaths());
+        parameter.addValue("assists",match.getAssists());
+        parameter.addValue("hero_url",match.getHeroUrl());
+        parameter.addValue("date",match.getDate());
+        parameter.addValue("win", match.getWin());
+        parameter.addValue("is_party", match.getIsParty());
 
-        return generatedKeyHolder.getKey().intValue();
+        namedParameterJdbcTemplate.update(query, parameter, generatedKeyHolder, new String[]{"id"});
+
+        return Objects.requireNonNull(generatedKeyHolder.getKey()).intValue();
     }
 
     private Match result(String query, MapSqlParameterSource parameter) {

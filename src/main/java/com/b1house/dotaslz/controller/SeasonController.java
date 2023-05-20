@@ -3,7 +3,6 @@ package com.b1house.dotaslz.controller;
 import com.b1house.dotaslz.model.Match;
 import com.b1house.dotaslz.model.Player;
 import com.b1house.dotaslz.model.Season;
-import com.b1house.dotaslz.model.SeasonDTO;
 import com.b1house.dotaslz.service.PlayerService;
 import com.b1house.dotaslz.service.SeasonService;
 import org.springframework.http.ResponseEntity;
