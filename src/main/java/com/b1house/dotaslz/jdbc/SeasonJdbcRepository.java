@@ -1,5 +1,6 @@
 package com.b1house.dotaslz.jdbc;
 
+import com.b1house.dotaslz.dto.RankingPlayer;
 import com.b1house.dotaslz.model.Match;
 import com.b1house.dotaslz.model.Player;
 import com.b1house.dotaslz.model.Season;
@@ -10,6 +11,7 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Component;
 
 import java.sql.Timestamp;
+import java.util.List;
 
 @Component
 public class SeasonJdbcRepository implements SeasonRepository {
@@ -26,6 +28,20 @@ public class SeasonJdbcRepository implements SeasonRepository {
     final String INSERT_SCORE = """
         INSERT INTO season_players (player_id, season_id, score, match_id, updated_at) VALUES (:player_id, :season_id, :score, :match_id, :updated_at)        
         """;
+
+    final String FIND_CURRENT_RANKING =  """
+    SELECT p.nome,p.nick,SUM(sp.score) as score,
+       count(CASE WHEN m.win = true AND m.is_party = true THEN 1 END) as winParty,
+       count(CASE WHEN m.win = false AND m.is_party = true THEN 1 END) as lossParty,
+       count(CASE WHEN m.win = true AND m.is_party = false THEN 1 END) as winSolo,
+       count(CASE WHEN m.win = false AND m.is_party = false THEN 1 END) as lossSolo
+        FROM season_players sp
+        INNER JOIN players p on p.id = sp.player_id
+        INNER JOIN matches m on m.id = sp.match_id
+        INNER JOIN season s on sp.season_id = s.id
+        WHERE s.actived = true
+        group by p.nome, p.nick;
+""";
 
     @Override
     public Season findSeasonActivated() {
@@ -52,6 +68,25 @@ public class SeasonJdbcRepository implements SeasonRepository {
         parameter.addValue("updated_at", match.getDate());
 
         namedParameterJdbcTemplate.update(query,parameter);
+    }
+
+    @Override
+    public List<RankingPlayer> getCurrentRankingOnActivatedSeason() {
+        String query = FIND_CURRENT_RANKING;
+        return namedParameterJdbcTemplate.query(query, (rs, rowNum) -> {
+            RankingPlayer rankingPlayer = new RankingPlayer();
+            rankingPlayer.setName(rs.getString("nome"));
+            rankingPlayer.setNick(rs.getString("nick"));
+            rankingPlayer.setScore(rs.getInt("score"));
+            rankingPlayer.setWinParty(rs.getInt("winParty"));
+            rankingPlayer.setWinSolo(rs.getInt("winSolo"));
+            rankingPlayer.setLossParty(rs.getInt("lossParty"));
+            rankingPlayer.setLossSolo(rs.getInt("lossSolo"));
+            rankingPlayer.setTotalMatches(rankingPlayer.getLossParty()+rankingPlayer.getLossSolo()+rankingPlayer.getWinParty()+rankingPlayer.getWinSolo());
+            rankingPlayer.setIsPlayerEligible(rankingPlayer.getTotalMatches() >= 20);
+
+            return rankingPlayer;
+        });
     }
 
     private Season result(String query, MapSqlParameterSource parameter) {

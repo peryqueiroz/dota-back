@@ -1,5 +1,6 @@
 package com.b1house.dotaslz.controller;
 
+import com.b1house.dotaslz.dto.RankingPlayer;
 import com.b1house.dotaslz.model.Match;
 import com.b1house.dotaslz.model.Player;
 import com.b1house.dotaslz.model.Season;
@@ -13,6 +14,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/season")
@@ -45,5 +48,10 @@ public class SeasonController {
             System.out.println("None Season activated or Player is smurf");
             return ResponseEntity.notFound().build();
         }
+    }
+
+    @GetMapping("/ranking")
+    ResponseEntity<List<RankingPlayer>> getCurrentRankingOnActivatedSeason(){
+        return ResponseEntity.ok(seasonService.getCurrentRankingOnActivatedSeason());
     }
 }

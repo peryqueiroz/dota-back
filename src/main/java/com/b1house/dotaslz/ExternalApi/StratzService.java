@@ -45,6 +45,7 @@ public class StratzService {
     }
     @Scheduled(fixedRate = 300000)
     public void scheduleFetchAndSaveNewMatches(){
+        System.out.println("Searching recent matches..");
         List<Player> players = playerService.getAllPlayers();
 
         players.forEach( player->{
