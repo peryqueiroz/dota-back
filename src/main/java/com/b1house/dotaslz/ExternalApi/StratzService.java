@@ -43,7 +43,7 @@ public class StratzService {
         this.matchService = matchService;
         this.seasonService = seasonService;
     }
-//    @Scheduled(fixedRate = 300000)
+    @Scheduled(fixedRate = 300000)
     public void scheduleFetchAndSaveNewMatches(){
         System.out.println("Searching recent matches..");
         List<Player> players = playerService.getAllPlayers();
@@ -57,7 +57,7 @@ public class StratzService {
             }
         });
     }
-//    @Scheduled(fixedRate = 1860000)
+    @Scheduled(fixedRate = 1860000)
     public void scheduleFetchAndSaveInfoPlayers(){
         System.out.println("Starting to fetch info players...");
         List<Player> players = playerService.getAllPlayers();
