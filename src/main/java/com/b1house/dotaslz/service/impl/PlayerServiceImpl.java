@@ -25,6 +25,11 @@ public class PlayerServiceImpl implements PlayerService {
     }
 
     @Override
+    public Player getPlayerByIdDota(String idDota) {
+        return playerRepository.findPlayerByIdDota(idDota);
+    }
+
+    @Override
     public void updateAvatar(Player player) {
         playerRepository.updateAvatar(player);
     }

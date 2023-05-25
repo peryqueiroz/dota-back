@@ -1,6 +1,7 @@
 package com.b1house.dotaslz.service;
 
 
+import com.b1house.dotaslz.enums.GameMode;
 import com.b1house.dotaslz.model.Match;
 import com.b1house.dotaslz.model.Player;
 
@@ -12,4 +13,6 @@ public interface MatchService {
     List<Match> getRecentMatchesByAllPlayers();
 
     Integer saveMatch(Match match);
+
+    void updateGameMode(Integer matchId, GameMode gameMode);
 }

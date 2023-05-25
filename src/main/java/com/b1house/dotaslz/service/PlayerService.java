@@ -11,6 +11,7 @@ public interface PlayerService {
     List<Player> getAllPlayers();
 
     Player getPlayerById(Integer id);
+    Player getPlayerByIdDota(String idDota);
 
     void updateAvatar(Player player);
     void updateNick(Player player);

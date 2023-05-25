@@ -1,10 +1,13 @@
 package com.b1house.dotaslz.service.impl;
 
 import com.b1house.dotaslz.dto.RankingPlayer;
+import com.b1house.dotaslz.enums.GameMode;
 import com.b1house.dotaslz.model.Match;
 import com.b1house.dotaslz.model.Player;
 import com.b1house.dotaslz.model.Season;
 import com.b1house.dotaslz.repository.SeasonRepository;
+import com.b1house.dotaslz.service.MatchService;
+import com.b1house.dotaslz.service.PlayerService;
 import com.b1house.dotaslz.service.SeasonService;
 import org.springframework.stereotype.Service;
 
@@ -16,9 +19,13 @@ import java.util.List;
 @Service
 public class SeasonServiceImpl implements SeasonService {
     private SeasonRepository seasonRepository;
+    private MatchService matchService;
+    private PlayerService playerService;
 
-    public SeasonServiceImpl(SeasonRepository seasonRepository){
+    public SeasonServiceImpl(SeasonRepository seasonRepository, MatchService matchService, PlayerService playerService){
         this.seasonRepository = seasonRepository;
+        this.matchService = matchService;
+        this.playerService = playerService;
     }
     @Override
     public Season getSeasonActivated() {
@@ -55,5 +62,25 @@ public class SeasonServiceImpl implements SeasonService {
         });
 
         return sortedList;
+    }
+
+    @Override
+    public void updateGameModeOfMatchAndScoreOnSeason(String matchIdDota, List<String> playersIdDota, GameMode gameMode, Boolean isWin) {
+        playersIdDota.forEach(playerIdDota->{
+            Player player = getPlayerByIdDota(playerIdDota);
+            Match match = getMatchByIdDota(player, matchIdDota);
+            updateGameModeMatch(match.getId(), gameMode);
+            seasonRepository.updateScoreOnSeason(match.getId(),player.getId(),gameMode,isWin);
+        });
+    }
+
+    private Player getPlayerByIdDota(String idDota){
+        return playerService.getPlayerByIdDota(idDota);
+    }
+    private Match getMatchByIdDota(Player player, String matchIdDota){
+        return matchService.getMatchByIdDota(player,matchIdDota);
+    }
+    private void updateGameModeMatch(Integer matchId, GameMode gameMode){
+        matchService.updateGameMode(matchId, gameMode);
     }
 }

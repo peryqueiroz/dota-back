@@ -10,6 +10,8 @@ public interface PlayerRepository {
 
     List<Player> findAllPlayers();
     Player findPlayerById(Integer id);
+
+    Player findPlayerByIdDota(String idDota);
     void updateAvatar(Player player);
     void updateNick(Player player);
     void updateIsPrivate(Player player);

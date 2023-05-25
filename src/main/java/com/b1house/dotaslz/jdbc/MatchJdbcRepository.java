@@ -1,5 +1,6 @@
 package com.b1house.dotaslz.jdbc;
 
+import com.b1house.dotaslz.enums.GameMode;
 import com.b1house.dotaslz.model.Match;
 import com.b1house.dotaslz.model.Player;
 import com.b1house.dotaslz.repository.MatchRepository;
@@ -30,6 +31,11 @@ public class MatchJdbcRepository implements MatchRepository {
     final String INSERT_MATCH = """
         INSERT INTO matches (id_dota, player_id, kills, deaths, assists, hero_url, date, win, is_party)
         VALUES (:id_dota, :player_id, :kills, :deaths, :assists, :hero_url, :date, :win, :is_party)
+        """;
+
+    final String UPDATE_GAME_MODE= """
+        UPDATE matches SET is_party = :is_party
+        WHERE id = :id
         """;
 
     @Override
@@ -73,6 +79,15 @@ public class MatchJdbcRepository implements MatchRepository {
         namedParameterJdbcTemplate.update(query, parameter, generatedKeyHolder, new String[]{"id"});
 
         return Objects.requireNonNull(generatedKeyHolder.getKey()).intValue();
+    }
+
+    @Override
+    public void updateGameMode(Integer matchId, GameMode gameMode) {
+        String query = UPDATE_GAME_MODE;
+        MapSqlParameterSource parameter = new MapSqlParameterSource();
+        parameter.addValue("is_party", gameMode == GameMode.PARTY);
+        parameter.addValue("id", matchId);
+        namedParameterJdbcTemplate.update(query,parameter);
     }
 
     private Match result(String query, MapSqlParameterSource parameter) {

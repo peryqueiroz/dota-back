@@ -1,5 +1,6 @@
 package com.b1house.dotaslz.service.impl;
 
+import com.b1house.dotaslz.enums.GameMode;
 import com.b1house.dotaslz.model.Match;
 import com.b1house.dotaslz.model.Player;
 import com.b1house.dotaslz.repository.MatchRepository;
@@ -47,5 +48,10 @@ public class MatchServiceImpl implements MatchService {
     @Override
     public Integer saveMatch(Match match) {
         return matchRepository.saveMatch(match);
+    }
+
+    @Override
+    public void updateGameMode(Integer matchId, GameMode gameMode) {
+        matchRepository.updateGameMode(matchId,gameMode);
     }
 }

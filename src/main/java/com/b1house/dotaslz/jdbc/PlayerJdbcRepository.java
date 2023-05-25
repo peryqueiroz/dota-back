@@ -76,6 +76,28 @@ public class PlayerJdbcRepository implements PlayerRepository {
     }
 
     @Override
+    public Player findPlayerByIdDota(String idDota) {
+        String query = FIND_ALL_PLAYER;
+        query += " WHERE id_dota = :id_dota ";
+        MapSqlParameterSource parameter = new MapSqlParameterSource();
+        parameter.addValue("id_dota", idDota);
+
+        return namedParameterJdbcTemplate.queryForObject(query, parameter,(rs, rowNum) -> {
+            Player player = new Player();
+            player.setId(rs.getInt("id"));
+            player.setIdDota(rs.getString("id_dota"));
+            player.setNome(rs.getString("nome"));
+            player.setNick(rs.getString("nick"));
+            player.setAvatar(rs.getString("avatar"));
+            player.setIsPrivate(rs.getBoolean("is_private"));
+            player.setMmr(rs.getInt("mmr"));
+            player.setIsMain(rs.getBoolean("is_main"));
+
+            return player;
+        });
+    }
+
+    @Override
     public void updateAvatar(Player player) {
         String query = UPDATE_AVATAR;
         MapSqlParameterSource parameter = new MapSqlParameterSource();

@@ -1,6 +1,7 @@
 package com.b1house.dotaslz.jdbc;
 
 import com.b1house.dotaslz.dto.RankingPlayer;
+import com.b1house.dotaslz.enums.GameMode;
 import com.b1house.dotaslz.model.Match;
 import com.b1house.dotaslz.model.Player;
 import com.b1house.dotaslz.model.Season;
@@ -42,6 +43,11 @@ public class SeasonJdbcRepository implements SeasonRepository {
         WHERE s.actived = true
         group by p.nome, p.nick;
 """;
+
+    final String UPDATE_GAME_MODE = """
+        UPDATE season_players SET score = :score
+        WHERE match_id = :match_id and player_id = :player_id ;
+        """;
 
     @Override
     public Season findSeasonActivated() {
@@ -87,6 +93,21 @@ public class SeasonJdbcRepository implements SeasonRepository {
 
             return rankingPlayer;
         });
+    }
+
+    @Override
+    public void updateScoreOnSeason(Integer idMatch, Integer playerId, GameMode gameMode, Boolean isWin) {
+        String query = UPDATE_GAME_MODE;
+        MapSqlParameterSource parameter = new MapSqlParameterSource();
+        Integer score = gameMode.getScore();
+        if (!isWin){
+            score = score * -1;
+        }
+        parameter.addValue("score", score);
+        parameter.addValue("match_id", idMatch);
+        parameter.addValue("player_id", playerId);
+
+        namedParameterJdbcTemplate.update(query, parameter);
     }
 
     private Season result(String query, MapSqlParameterSource parameter) {
