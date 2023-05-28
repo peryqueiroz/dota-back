@@ -33,8 +33,8 @@ public class SeasonServiceImpl implements SeasonService {
     }
 
     @Override
-    public void saveScoreSeasonPlayer(Player player, Season season, Match match, Integer score) {
-        seasonRepository.saveScoreSeasonPlayer(player,season, match, score);
+    public void saveScoreSeasonPlayer(Player player, Season season, Match match) {
+        seasonRepository.saveScoreSeasonPlayer(player,season, match);
     }
 
     @Override

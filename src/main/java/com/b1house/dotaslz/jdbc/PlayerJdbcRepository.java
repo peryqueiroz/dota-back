@@ -6,6 +6,7 @@ import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Component;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Component
@@ -32,6 +33,33 @@ public class PlayerJdbcRepository implements PlayerRepository {
     final String UPDATE_PRIVATE = """
         UPDATE players SET is_private = :is_private
         WHERE id = :id
+        """;
+
+    final String COUNT_STREAK_WIN = """
+        UPDATE players SET streak_win = streak_win + 1
+        WHERE id = :id;
+        """;
+    final String COUNT_STREAK_LOSS = """
+        UPDATE players SET streak_loss = streak_loss + 1
+        WHERE id = :id;
+        """;
+
+    final String RESET_STREAK_WIN = """
+        UPDATE players SET streak_win = 0
+        where id = :id
+        """;
+
+    final String RESET_STREAK_LOSS = """
+        UPDATE players SET streak_loss = 0
+        where id = :id
+        """;
+
+    final String GET_STREAK_WIN = """
+        SELECT streak_win from players where id = :id
+        """;
+
+    final String GET_STREAK_LOSS = """
+        SELECT streak_loss from players where id = :id
         """;
 
     @Override
@@ -125,5 +153,39 @@ public class PlayerJdbcRepository implements PlayerRepository {
         parameter.addValue("id", player.getId());
 
         namedParameterJdbcTemplate.update(query,parameter);
+    }
+
+    @Override
+    public void updateStreak(Player player,Boolean win) {
+        String query = win? COUNT_STREAK_WIN : COUNT_STREAK_LOSS ;
+        String queryReset = win? RESET_STREAK_LOSS : RESET_STREAK_WIN;
+
+        MapSqlParameterSource parameter = new MapSqlParameterSource();
+        MapSqlParameterSource parameterReset = new MapSqlParameterSource();
+
+        parameter.addValue("id", player.getId());
+        namedParameterJdbcTemplate.update(query,parameter);
+
+        parameterReset.addValue("id", player.getId());
+        namedParameterJdbcTemplate.update(queryReset, parameterReset);
+    }
+
+    @Override
+    public Integer getStreakWin(Player player) {
+        String query = GET_STREAK_WIN;
+        MapSqlParameterSource parameter = new MapSqlParameterSource();
+        parameter.addValue("id", player.getId());
+
+        return namedParameterJdbcTemplate.queryForObject(query,parameter, BigDecimal.class).intValueExact();
+    }
+
+    @Override
+    public Integer getStreakLoss(Player player) {
+        String query = GET_STREAK_LOSS;
+        MapSqlParameterSource parameter = new MapSqlParameterSource();
+        parameter.addValue("streak", "streak_loss");
+        parameter.addValue("id", player.getId());
+
+        return namedParameterJdbcTemplate.queryForObject(query,parameter, Integer.class);
     }
 }

@@ -63,9 +63,12 @@ public class SeasonJdbcRepository implements SeasonRepository {
     }
 
     @Override
-    public void saveScoreSeasonPlayer(Player player, Season season, Match match, Integer score) {
+    public void saveScoreSeasonPlayer(Player player, Season season, Match match) {
         String query = INSERT_SCORE;
         MapSqlParameterSource parameter = new MapSqlParameterSource();
+
+        Integer score = match.getIsParty()? 20:30;
+        score = match.getWin()? score : (score * -1);
 
         parameter.addValue("player_id", player.getId());
         parameter.addValue("season_id", season.getId());

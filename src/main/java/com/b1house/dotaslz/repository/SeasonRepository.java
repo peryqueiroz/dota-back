@@ -5,14 +5,16 @@ import com.b1house.dotaslz.enums.GameMode;
 import com.b1house.dotaslz.model.Match;
 import com.b1house.dotaslz.model.Player;
 import com.b1house.dotaslz.model.Season;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
+@Repository
 public interface SeasonRepository {
 
     Season findSeasonActivated();
 
-    void saveScoreSeasonPlayer(Player player, Season season, Match match, Integer score);
+    void saveScoreSeasonPlayer(Player player, Season season, Match match);
 
     List<RankingPlayer> getCurrentRankingOnActivatedSeason();
 

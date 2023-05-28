@@ -43,4 +43,19 @@ public class PlayerServiceImpl implements PlayerService {
     public void updateIsPrivate(Player player) {
         playerRepository.updateIsPrivate(player);
     }
+
+    @Override
+    public void updateStreak(Player player, Boolean win) {
+        playerRepository.updateStreak(player, win);
+    }
+
+    @Override
+    public Integer getStreakWin(Player player) {
+        return playerRepository.getStreakWin(player);
+    }
+
+    @Override
+    public Integer getStreakLoss(Player player) {
+        return playerRepository.getStreakLoss(player);
+    }
 }

@@ -29,12 +29,17 @@ public class Player {
     private Integer mmr;
     @Column("is_main")
     private Boolean isMain;
+    @Column("streak_win")
+    private Integer streakWin;
+    @Column("streak_loss")
+    private Integer streakLoss;
     public Player(){}
 
     public Player(Integer id){
         this.id = id;
     }
-    public Player(Integer id, String idDota, String nome, String nick, String avatar, Boolean isPrivate, Integer mmr, Boolean isMain) {
+    public Player(Integer id, String idDota, String nome, String nick, String avatar, Boolean isPrivate, Integer mmr,
+                  Boolean isMain, Integer streakLoss, Integer streakWin) {
         this.id = id;
         this.idDota = idDota;
         this.nome = nome;
@@ -43,6 +48,8 @@ public class Player {
         this.isPrivate = isPrivate;
         this.mmr = mmr;
         this.isMain =isMain;
+        this.streakLoss = streakLoss;
+        this.streakWin = streakWin;
     }
     public Integer getId() {
         return id;

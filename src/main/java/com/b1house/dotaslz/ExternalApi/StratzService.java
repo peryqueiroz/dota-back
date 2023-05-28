@@ -4,6 +4,7 @@ import com.b1house.dotaslz.enums.GameMode;
 import com.b1house.dotaslz.model.Match;
 import com.b1house.dotaslz.model.Player;
 import com.b1house.dotaslz.model.Season;
+import com.b1house.dotaslz.service.AchievementService;
 import com.b1house.dotaslz.service.MatchService;
 import com.b1house.dotaslz.service.PlayerService;
 import com.b1house.dotaslz.service.SeasonService;
@@ -35,13 +36,16 @@ public class StratzService {
     private final MatchService matchService;
     private final SeasonService seasonService;
 
+    private final AchievementService achievementService;
+
     public StratzService(RestTemplate restTemplate, @Value("${external.api.token}") String bearerToken, PlayerService playerService,
-                         MatchService matchService, SeasonService seasonService) {
+                         MatchService matchService, SeasonService seasonService, AchievementService achievementService) {
         this.restTemplate = restTemplate;
         this.bearerToken = bearerToken;
         this.playerService = playerService;
         this.matchService = matchService;
         this.seasonService = seasonService;
+        this.achievementService = achievementService;
     }
     @Scheduled(fixedRate = 300000)
     public void scheduleFetchAndSaveNewMatches(){
@@ -104,6 +108,7 @@ public class StratzService {
                     System.out.println(match.getWin()? "Win" : "Loss");
 
                     updateScorePlayer(player, match, season);
+                    updateAchievement(player, match);
                 }
             }
         } catch (Exception e){
@@ -241,6 +246,11 @@ public class StratzService {
         GameMode gameMode = match.getIsParty() ? GameMode.PARTY : GameMode.SOLO;
         Integer scoreFinal = match.getWin() ? gameMode.getScore() : (gameMode.getScore() * -1);
 
-        seasonService.saveScoreSeasonPlayer(player,season,match,scoreFinal);
+        seasonService.saveScoreSeasonPlayer(player,season,match);
+    }
+
+    private void updateAchievement(Player player, Match match){
+        achievementService.updateWinLoss(player, match);
+//        achievementService.updateKda(player, match);
     }
 }

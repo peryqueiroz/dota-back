@@ -11,7 +11,7 @@ import java.util.List;
 public interface SeasonService {
 
     Season getSeasonActivated();
-    void saveScoreSeasonPlayer(Player player, Season season, Match match, Integer score);
+    void saveScoreSeasonPlayer(Player player, Season season, Match match);
     List<RankingPlayer> getCurrentRankingOnActivatedSeason();
     void updateGameModeOfMatchAndScoreOnSeason(String matchIdDota, List<String> playersIdDota, GameMode gameMode, Boolean isWin);
 }

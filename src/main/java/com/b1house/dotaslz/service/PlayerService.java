@@ -16,4 +16,8 @@ public interface PlayerService {
     void updateAvatar(Player player);
     void updateNick(Player player);
     void updateIsPrivate(Player player);
+
+    void updateStreak(Player player, Boolean win);
+    Integer getStreakWin(Player player);
+    Integer getStreakLoss(Player player);
 }

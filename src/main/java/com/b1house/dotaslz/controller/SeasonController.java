@@ -5,6 +5,7 @@ import com.b1house.dotaslz.enums.GameMode;
 import com.b1house.dotaslz.model.Match;
 import com.b1house.dotaslz.model.Player;
 import com.b1house.dotaslz.model.Season;
+import com.b1house.dotaslz.service.MatchService;
 import com.b1house.dotaslz.service.PlayerService;
 import com.b1house.dotaslz.service.SeasonService;
 import org.springframework.http.ResponseEntity;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -23,10 +25,12 @@ import java.util.List;
 public class SeasonController {
     private SeasonService seasonService;
     private PlayerService playerService;
+    private MatchService matchService;
 
-    public SeasonController(SeasonService seasonService, PlayerService playerService){
+    public SeasonController(SeasonService seasonService, PlayerService playerService, MatchService matchService){
         this.seasonService = seasonService;
         this.playerService = playerService;
+        this.matchService = matchService;
     }
 
     @GetMapping("/activated")
@@ -34,37 +38,45 @@ public class SeasonController {
         return ResponseEntity.ok(seasonService.getSeasonActivated());
     }
 
-//    @PostMapping("/player/saveScore/{playerId}")
-//    ResponseEntity saveScorePlayer(@RequestParam Integer score, @RequestParam Integer matchId, @PathVariable Integer playerId){
-//        Player player = playerService.getPlayerById(playerId);
-//        Season season = seasonService.getSeasonActivated();
-//        Match match = new Match();
-//        match.setId(matchId);
-//
-//        if(season.getId() != null && player.getIsMain()){
-//            seasonService.saveScoreSeasonPlayer(player, season, match, score);
-//            return ResponseEntity.ok().body("Score of " + player.getNome()+" saved - "+score+" points");
-//        }
-//        else{
-//            System.out.println("None Season activated or Player is smurf");
-//            return ResponseEntity.notFound().build();
-//        }
-//    }
+    @PostMapping("/player/saveScore/{playerId}")
+    ResponseEntity saveScorePlayer(@RequestParam Boolean win, @RequestParam String matchIdDota,
+                                   @RequestParam Boolean isParty,
+                                   @RequestParam String heroUrl,
+                                   @RequestParam LocalDateTime date,
+                                   @PathVariable String playerIdDota){
+        Player player = playerService.getPlayerByIdDota(playerIdDota);
+        Season season = seasonService.getSeasonActivated();
+
+        Match match = new Match();
+        match.setPlayer(player);
+        match.setIsParty(isParty);
+        match.setWin(win);
+        match.setHeroUrl(heroUrl);
+        match.setDate(date);
+        match.setIdDota(matchIdDota);
+
+        Integer idMatch = matchService.saveMatch(match);
+        match.setId(idMatch);
+
+        seasonService.saveScoreSeasonPlayer(player, season, match);
+
+        return ResponseEntity.ok().body("Match saved");
+    }
 
     @GetMapping("/ranking")
     ResponseEntity<List<RankingPlayer>> getCurrentRankingOnActivatedSeason(){
         return ResponseEntity.ok(seasonService.getCurrentRankingOnActivatedSeason());
     }
 
-//    @PutMapping("/match")
-//    ResponseEntity<String> updateGameModeOfMatchOnSeason(@RequestParam String idMatch, @RequestParam List<String> playersIdDota,
-//                                                         @RequestParam GameMode gameMode, @RequestParam Boolean isWin){
-//        try{
-//            seasonService.updateGameModeOfMatchAndScoreOnSeason(idMatch, playersIdDota, gameMode, isWin);
-//            return ResponseEntity.ok("ok");
-//        }
-//        catch (Exception e){
-//            return ResponseEntity.ok(e.getMessage());
-//        }
-//    }
+    @PutMapping("/match")
+    ResponseEntity<String> updateGameModeOfMatchOnSeason(@RequestParam String idMatch, @RequestParam List<String> playersIdDota,
+                                                         @RequestParam GameMode gameMode, @RequestParam Boolean isWin){
+        try{
+            seasonService.updateGameModeOfMatchAndScoreOnSeason(idMatch, playersIdDota, gameMode, isWin);
+            return ResponseEntity.ok("ok");
+        }
+        catch (Exception e){
+            return ResponseEntity.ok(e.getMessage());
+        }
+    }
 }
