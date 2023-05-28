@@ -37,7 +37,7 @@ public class SeasonController {
         return ResponseEntity.ok(seasonService.getSeasonActivated());
     }
 
-    @PostMapping("/player/saveScore/{playerId}")
+    @PostMapping("/player/saveScore/{playerIdDota}")
     ResponseEntity saveScorePlayer(@RequestParam Boolean win, @RequestParam String matchIdDota,
                                    @RequestParam Boolean isParty,
                                    @RequestParam String heroUrl,
