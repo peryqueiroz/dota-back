@@ -15,4 +15,6 @@ public interface MatchService {
     Integer saveMatch(Match match);
 
     void updateGameMode(Integer matchId, GameMode gameMode);
+
+    List<Match> getAll();
 }

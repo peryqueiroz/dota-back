@@ -9,7 +9,10 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.stereotype.Component;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.util.List;
 import java.util.Objects;
 
 @Component
@@ -47,7 +50,7 @@ public class MatchJdbcRepository implements MatchRepository {
         parameter.addValue("id_dota", idDota);
         parameter.addValue("player_id", player.getId());
 
-        return result(query, parameter);
+        return namedParameterJdbcTemplate.queryForObject(query, parameter, this::rowMapper);
     }
 
     @Override
@@ -57,7 +60,7 @@ public class MatchJdbcRepository implements MatchRepository {
         MapSqlParameterSource parameter = new MapSqlParameterSource();
         parameter.addValue("player_id", playerId);
 
-        return result(query, parameter);
+        return namedParameterJdbcTemplate.queryForObject(query, parameter, this::rowMapper);
     }
 
     @Override
@@ -90,31 +93,36 @@ public class MatchJdbcRepository implements MatchRepository {
         namedParameterJdbcTemplate.update(query,parameter);
     }
 
-    private Match result(String query, MapSqlParameterSource parameter) {
-        return namedParameterJdbcTemplate.queryForObject(query, parameter, (rs, rowNum) -> {
-            Match match = new Match();
-            match.setId(rs.getInt("match_id"));
-            match.setIdDota(rs.getString("match_id_dota"));
-            match.setKills(rs.getInt("kills"));
-            match.setAssists(rs.getInt("assists"));
-            match.setDeaths(rs.getInt("deaths"));
-            match.setHeroUrl(rs.getString("hero_url"));
-            match.setWin(rs.getBoolean("win"));
-            match.setIsParty(rs.getBoolean("is_party"));
+    @Override
+    public List<Match> findAll() {
+        String query = FIND_MATCH;
+        query += " ORDER BY date desc ";
 
-            Timestamp timestamp = rs.getTimestamp("date");
-            match.setDate(timestamp.toLocalDateTime());
+        return namedParameterJdbcTemplate.query(query, this::rowMapper);
+    }
+    private Match rowMapper(ResultSet rs, int rowNum) throws SQLException {
+        Match match = new Match();
+        match.setId(rs.getInt("match_id"));
+        match.setIdDota(rs.getString("match_id_dota"));
+        match.setKills(rs.getInt("kills"));
+        match.setAssists(rs.getInt("assists"));
+        match.setDeaths(rs.getInt("deaths"));
+        match.setHeroUrl(rs.getString("hero_url"));
+        match.setWin(rs.getBoolean("win"));
+        match.setIsParty(rs.getBoolean("is_party"));
 
-            Player player = new Player();
-            player.setId(rs.getInt("player_id"));
-            player.setIdDota(rs.getString("player_id_dota"));
-            player.setNome(rs.getString("nome"));
-            player.setNick(rs.getString("nick"));
-            player.setAvatar(rs.getString("avatar"));
-            player.setIsPrivate(rs.getBoolean("is_private"));
-            match.setPlayer(player);
+        Timestamp timestamp = rs.getTimestamp("date");
+        match.setDate(timestamp.toLocalDateTime());
 
-            return match;
-        });
+        Player player = new Player();
+        player.setId(rs.getInt("player_id"));
+        player.setIdDota(rs.getString("player_id_dota"));
+        player.setNome(rs.getString("nome"));
+        player.setNick(rs.getString("nick"));
+        player.setAvatar(rs.getString("avatar"));
+        player.setIsPrivate(rs.getBoolean("is_private"));
+        match.setPlayer(player);
+
+        return match;
     }
 }

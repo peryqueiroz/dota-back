@@ -5,6 +5,8 @@ import com.b1house.dotaslz.model.Match;
 import com.b1house.dotaslz.model.Player;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 public interface MatchRepository {
     Match findMatchByIdDota(Player player, String idDota);
@@ -14,4 +16,6 @@ public interface MatchRepository {
     Integer saveMatch(Match match);
 
     void updateGameMode(Integer matchId, GameMode gameMode);
+
+    List<Match> findAll();
 }

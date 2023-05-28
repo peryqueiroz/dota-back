@@ -24,6 +24,11 @@ public class MatchController {
 //        return ResponseEntity.ok(matchService.getMatchByIdDota(idDota));
 //    }
 
+    @GetMapping
+    ResponseEntity<List<Match>> getAll(){
+        return ResponseEntity.ok(matchService.getAll());
+    }
+
     @GetMapping("/recent")
     ResponseEntity<List<Match>> getRecentMatchesByAllPlayers(){
         return ResponseEntity.ok(matchService.getRecentMatchesByAllPlayers());

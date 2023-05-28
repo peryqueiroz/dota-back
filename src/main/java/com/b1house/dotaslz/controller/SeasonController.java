@@ -32,7 +32,6 @@ public class SeasonController {
         this.playerService = playerService;
         this.matchService = matchService;
     }
-
     @GetMapping("/activated")
     ResponseEntity<Season> getSeasonActivated(){
         return ResponseEntity.ok(seasonService.getSeasonActivated());
@@ -43,6 +42,9 @@ public class SeasonController {
                                    @RequestParam Boolean isParty,
                                    @RequestParam String heroUrl,
                                    @RequestParam LocalDateTime date,
+                                   @RequestParam Integer kills,
+                                   @RequestParam Integer deaths,
+                                   @RequestParam Integer assists,
                                    @PathVariable String playerIdDota){
         Player player = playerService.getPlayerByIdDota(playerIdDota);
         Season season = seasonService.getSeasonActivated();
@@ -54,6 +56,9 @@ public class SeasonController {
         match.setHeroUrl(heroUrl);
         match.setDate(date);
         match.setIdDota(matchIdDota);
+        match.setKills(kills);
+        match.setAssists(assists);
+        match.setDeaths(deaths);
 
         Integer idMatch = matchService.saveMatch(match);
         match.setId(idMatch);

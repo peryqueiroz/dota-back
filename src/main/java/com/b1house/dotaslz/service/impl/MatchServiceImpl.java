@@ -54,4 +54,9 @@ public class MatchServiceImpl implements MatchService {
     public void updateGameMode(Integer matchId, GameMode gameMode) {
         matchRepository.updateGameMode(matchId,gameMode);
     }
+
+    @Override
+    public List<Match> getAll() {
+        return matchRepository.findAll();
+    }
 }
