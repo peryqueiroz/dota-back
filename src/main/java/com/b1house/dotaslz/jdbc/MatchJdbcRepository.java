@@ -54,13 +54,27 @@ public class MatchJdbcRepository implements MatchRepository {
     }
 
     @Override
-    public Match findRecentMatchByPlayer(Integer playerId) {
+    public List<Match> findRecentMatchByPlayer(Integer playerId) {
         String query = FIND_MATCH;
-        query += " where player_id = :player_id order by date desc limit 1";
+        query += " where player_id = :player_id order by date desc limit 3";
         MapSqlParameterSource parameter = new MapSqlParameterSource();
         parameter.addValue("player_id", playerId);
 
-        return namedParameterJdbcTemplate.queryForObject(query, parameter, this::rowMapper);
+        return namedParameterJdbcTemplate.query(query, parameter, (rs, rowNum) -> {
+            Match match = new Match();
+            match.setId(rs.getInt("match_id"));
+            match.setIdDota(rs.getString("match_id_dota"));
+            match.setKills(rs.getInt("kills"));
+            match.setAssists(rs.getInt("assists"));
+            match.setDeaths(rs.getInt("deaths"));
+            match.setHeroUrl(rs.getString("hero_url"));
+            match.setWin(rs.getBoolean("win"));
+            match.setIsParty(rs.getBoolean("is_party"));
+
+            Timestamp timestamp = rs.getTimestamp("date");
+            match.setDate(timestamp.toLocalDateTime());
+            return match;
+        });
     }
 
     @Override
@@ -105,7 +119,7 @@ public class MatchJdbcRepository implements MatchRepository {
     public List<Match> findRecentMatches() {
         String query = FIND_MATCH;
         query += " order by date desc limit 20";
-        
+
         return namedParameterJdbcTemplate.query(query, this::rowMapper);
     }
 

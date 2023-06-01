@@ -1,5 +1,6 @@
 package com.b1house.dotaslz.service.impl;
 
+import com.b1house.dotaslz.dto.MatchPlayers;
 import com.b1house.dotaslz.enums.GameMode;
 import com.b1house.dotaslz.model.Match;
 import com.b1house.dotaslz.model.Player;
@@ -12,6 +13,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+
+import static java.util.stream.Collectors.toList;
 
 @Service
 public class MatchServiceImpl implements MatchService {
@@ -30,18 +33,24 @@ public class MatchServiceImpl implements MatchService {
     @Override
     public List<Match> getRecentMatchesByAllPlayers() {
         List<Player> players = playerService.getAllPlayers();
-        List<Match> matches = players.stream().map(player -> matchRepository.findRecentMatchByPlayer(player.getId())).toList();
+        List<MatchPlayers> matches = new ArrayList<>();
+
+        players.forEach(player ->{
+            MatchPlayers matchPlayers = new MatchPlayers();
+            matchPlayers.setPlayer(player);
+            matchPlayers.setMatches(matchRepository.findRecentMatchByPlayer(player.getId()));
+            matches.add(matchPlayers);
+        });
 
         List unmodifiableList = Collections.unmodifiableList(matches);
         List newList = new ArrayList(unmodifiableList);
-        Collections.sort(newList, new Comparator<Match>() {
-            public int compare(Match o1, Match o2) {
-                if (o1.getDate() == null || o2.getDate() == null)
+        Collections.sort(newList, new Comparator<MatchPlayers>() {
+            public int compare(MatchPlayers o1, MatchPlayers o2) {
+                if (o1.getMatches().get(0).getDate() == null || o2.getMatches().get(0).getDate()  == null)
                     return 0;
-                return o2.getDate().compareTo(o1.getDate());
+                return o2.getMatches().get(0).getDate().compareTo(o1.getMatches().get(0).getDate() );
             }
         });
-
         return newList;
     }
 

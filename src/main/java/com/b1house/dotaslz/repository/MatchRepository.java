@@ -11,7 +11,7 @@ import java.util.List;
 public interface MatchRepository {
     Match findMatchByIdDota(Player player, String idDota);
 
-    Match findRecentMatchByPlayer(Integer playerId);
+    List<Match> findRecentMatchByPlayer(Integer playerId);
 
     Integer saveMatch(Match match);
 
