@@ -100,6 +100,15 @@ public class MatchJdbcRepository implements MatchRepository {
 
         return namedParameterJdbcTemplate.query(query, this::rowMapper);
     }
+
+    @Override
+    public List<Match> findRecentMatches() {
+        String query = FIND_MATCH;
+        query += " order by date desc limit 20";
+        
+        return namedParameterJdbcTemplate.query(query, this::rowMapper);
+    }
+
     private Match rowMapper(ResultSet rs, int rowNum) throws SQLException {
         Match match = new Match();
         match.setId(rs.getInt("match_id"));

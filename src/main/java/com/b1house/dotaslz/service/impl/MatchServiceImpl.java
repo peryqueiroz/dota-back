@@ -59,4 +59,9 @@ public class MatchServiceImpl implements MatchService {
     public List<Match> getAll() {
         return matchRepository.findAll();
     }
+
+    @Override
+    public List<Match> getRecentMatches() {
+        return matchRepository.findRecentMatches();
+    }
 }

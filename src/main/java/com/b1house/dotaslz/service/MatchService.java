@@ -17,4 +17,6 @@ public interface MatchService {
     void updateGameMode(Integer matchId, GameMode gameMode);
 
     List<Match> getAll();
+
+    List<Match> getRecentMatches();
 }

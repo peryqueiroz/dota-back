@@ -18,4 +18,6 @@ public interface MatchRepository {
     void updateGameMode(Integer matchId, GameMode gameMode);
 
     List<Match> findAll();
+
+    List<Match> findRecentMatches();
 }
