@@ -9,5 +9,5 @@ array=(${string//,/ })
 # Careful with the ; https://stackoverflow.com/a/20666248/1057052
 for i in "${!array[@]}"; do
   echo "Deploy project on server ${array[i]}"
-sudo ssh ubuntu@${array[i]} 'cd ./Staging/vr && git stash && git checkout $CI_BUILD_REF_NAME && git stash && git pull && sudo yarn install && sudo npm run staging'
+ssh ubuntu@${array[i]} 'sudo cd ./Staging/vr && git stash && git checkout $CI_BUILD_REF_NAME && git stash && git pull && sudo yarn install && sudo npm run staging'
 done
