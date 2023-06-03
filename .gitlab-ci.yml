@@ -1,3 +1,7 @@
+stages:
+  - Deploy to Production
+
+
 Deploy to Production:
   stage: production
   before_script:
