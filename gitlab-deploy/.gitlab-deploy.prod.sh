@@ -9,5 +9,5 @@ array=(${string//,/ })
 # Careful with the ; https://stackoverflow.com/a/20666248/1057052
 for i in "${!array[@]}"; do
   echo "Deploy project on server ${array[i]}"
-sshpass -p 8004882e ssh -o StrictHostKeyChecking=no ec2-user@${array[i]}
+sshpass -p $DEPLOY_SERVER_PASSWD ssh -o StrictHostKeyChecking=no ec2-user@${array[i]} 'echo $HOME'
 done
