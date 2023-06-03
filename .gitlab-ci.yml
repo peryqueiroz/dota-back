@@ -8,8 +8,8 @@ Deploy to Production:
     - echo -e "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
     - chmod 600  ~/.ssh/id_rsa
     - '[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
-    - sudo apt-get update
-    - sudo apt-get install sshpass
+    - apt-get update
+    - apt-get install sshpass
   script:
     - bash ./gitlab-deploy/.gitlab-deploy.prod.sh
   environment:
