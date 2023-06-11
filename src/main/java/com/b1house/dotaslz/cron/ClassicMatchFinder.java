@@ -17,6 +17,7 @@ public class ClassicMatchFinder {
 
     @Scheduled(fixedRate = 43200000)
     public void findMultiplePlayersByMatch(){
+        System.out.println("Starting to search classic matches");
         List<MatchQuantityPlayers> matchQuantityPlayers = matchService.getMultiplePlayersByMatch();
 
         if(!matchQuantityPlayers.isEmpty()){
