@@ -1,5 +1,6 @@
 package com.b1house.dotaslz.repository;
 
+import com.b1house.dotaslz.dto.MatchQuantityPlayers;
 import com.b1house.dotaslz.enums.GameMode;
 import com.b1house.dotaslz.model.Match;
 import com.b1house.dotaslz.model.Player;
@@ -20,4 +21,6 @@ public interface MatchRepository {
     List<Match> findAll();
 
     List<Match> findRecentMatches();
+
+    List<MatchQuantityPlayers> findMultiplePlayersByMatch();
 }

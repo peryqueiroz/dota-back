@@ -1,5 +1,6 @@
 package com.b1house.dotaslz.jdbc;
 
+import com.b1house.dotaslz.dto.MatchQuantityPlayers;
 import com.b1house.dotaslz.enums.GameMode;
 import com.b1house.dotaslz.model.Match;
 import com.b1house.dotaslz.model.Player;
@@ -39,6 +40,11 @@ public class MatchJdbcRepository implements MatchRepository {
     final String UPDATE_GAME_MODE= """
         UPDATE matches SET is_party = :is_party
         WHERE id = :id
+        """;
+
+    final String FIND_MULTIPLE_PLAYERS_BY_MATCH = """
+        select id_dota, count(player_id) as quantity, win from matches where is_party = false 
+        and date > '2023-05-21 23:59:59.000000' group by id_dota, is_party, win having count(player_id) > 2;
         """;
 
     @Override
@@ -121,6 +127,18 @@ public class MatchJdbcRepository implements MatchRepository {
         query += " order by date desc limit 20";
 
         return namedParameterJdbcTemplate.query(query, this::rowMapper);
+    }
+
+    @Override
+    public List<MatchQuantityPlayers> findMultiplePlayersByMatch() {
+        return namedParameterJdbcTemplate.query(FIND_MULTIPLE_PLAYERS_BY_MATCH,(rs, rowNum) -> {
+            MatchQuantityPlayers matchQuantityPlayers = new MatchQuantityPlayers();
+            matchQuantityPlayers.setIdDota(rs.getString("id_dota"));
+            matchQuantityPlayers.setQuantity(rs.getInt("quantity"));
+            matchQuantityPlayers.setWin(rs.getBoolean("win"));
+
+            return matchQuantityPlayers;
+        });
     }
 
     private Match rowMapper(ResultSet rs, int rowNum) throws SQLException {

@@ -49,7 +49,6 @@ public class StratzService {
     }
     @Scheduled(fixedRate = 300000)
     public void scheduleFetchAndSaveNewMatches(){
-        System.out.println("Searching recent matches..");
         List<Player> players = playerService.getAllPlayers();
 
         players.forEach( player->{
@@ -63,7 +62,6 @@ public class StratzService {
     }
     @Scheduled(fixedRate = 1860000)
     public void scheduleFetchAndSaveInfoPlayers(){
-        System.out.println("Starting to fetch info players...");
         List<Player> players = playerService.getAllPlayers();
 
         players.forEach( player->{
@@ -74,8 +72,6 @@ public class StratzService {
                 System.out.println(e.getMessage());
             }
         });
-
-        System.out.println("Ended fetch info");
     }
     private void fetchDataFromApiByPlayer(Player player){
         try {

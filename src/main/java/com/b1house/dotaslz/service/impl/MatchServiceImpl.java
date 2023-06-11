@@ -1,6 +1,7 @@
 package com.b1house.dotaslz.service.impl;
 
 import com.b1house.dotaslz.dto.MatchPlayers;
+import com.b1house.dotaslz.dto.MatchQuantityPlayers;
 import com.b1house.dotaslz.enums.GameMode;
 import com.b1house.dotaslz.model.Match;
 import com.b1house.dotaslz.model.Player;
@@ -72,5 +73,10 @@ public class MatchServiceImpl implements MatchService {
     @Override
     public List<Match> getRecentMatches() {
         return matchRepository.findRecentMatches();
+    }
+
+    @Override
+    public List<MatchQuantityPlayers> getMultiplePlayersByMatch() {
+        return matchRepository.findMultiplePlayersByMatch();
     }
 }

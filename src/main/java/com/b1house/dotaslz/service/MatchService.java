@@ -1,6 +1,7 @@
 package com.b1house.dotaslz.service;
 
 
+import com.b1house.dotaslz.dto.MatchQuantityPlayers;
 import com.b1house.dotaslz.enums.GameMode;
 import com.b1house.dotaslz.model.Match;
 import com.b1house.dotaslz.model.Player;
@@ -19,4 +20,6 @@ public interface MatchService {
     List<Match> getAll();
 
     List<Match> getRecentMatches();
+
+    List<MatchQuantityPlayers> getMultiplePlayersByMatch();
 }
