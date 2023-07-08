@@ -47,7 +47,7 @@ public class StratzService {
         this.seasonService = seasonService;
         this.achievementService = achievementService;
     }
-    @Scheduled(fixedRate = 300000)
+//    @Scheduled(fixedRate = 300000)
     public void scheduleFetchAndSaveNewMatches(){
         List<Player> players = playerService.getAllPlayers();
 
@@ -60,7 +60,7 @@ public class StratzService {
             }
         });
     }
-    @Scheduled(fixedRate = 1860000)
+//    @Scheduled(fixedRate = 1860000)
     public void scheduleFetchAndSaveInfoPlayers(){
         List<Player> players = playerService.getAllPlayers();
 
@@ -92,14 +92,18 @@ public class StratzService {
 
                 System.out.println(player.getNome() +" has a new match - "+ matchId);
                 Match match = fillMatchFromApiResponse(response, player);
-                Season season = getSeasonActivated();
+                Season season = new Season();
+                try{
+                    season = getSeasonActivated();
+                } catch (Exception e){
+                    System.out.println("Match out of Season");
+                }
 
                 Integer matchIdSaved = saveMatch(match);
-//                saveMatch(match);
                 match.setId(matchIdSaved);
 
                 if(season.getId() != null && player.getIsMain()){
-                    System.out.println(match.getIsParty()? "Party ":"Solo " + "match "+ match.getIdDota()+"of " +player.getNome()+" on Season " + season.getVersion() + " detected..");
+                    System.out.println(match.getIsParty()? "Party ":"Solo " + "match "+ match.getIdDota()+" of " +player.getNome()+" on Season " + season.getVersion() + " detected..");
                     System.out.print("Result - ");
                     System.out.println(match.getWin()? "Win" : "Loss");
 

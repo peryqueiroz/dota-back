@@ -22,4 +22,5 @@ public interface MatchService {
     List<Match> getRecentMatches();
 
     List<MatchQuantityPlayers> getMultiplePlayersByMatch();
+    void updateMatchInfos(Integer heroDamage, Integer towerDamage, Integer heroHealing, Integer imp, String award, Integer matchId);
 }

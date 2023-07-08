@@ -15,8 +15,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import static java.util.stream.Collectors.toList;
-
 @Service
 public class MatchServiceImpl implements MatchService {
     private MatchRepository matchRepository;
@@ -78,5 +76,11 @@ public class MatchServiceImpl implements MatchService {
     @Override
     public List<MatchQuantityPlayers> getMultiplePlayersByMatch() {
         return matchRepository.findMultiplePlayersByMatch();
+    }
+
+    @Override
+    public void updateMatchInfos(Integer heroDamage, Integer towerDamage, Integer heroHealing, Integer imp, String award,
+                                 Integer matchId) {
+        matchRepository.updateMatchInfos(heroDamage,towerDamage,heroHealing,imp,award,matchId);
     }
 }

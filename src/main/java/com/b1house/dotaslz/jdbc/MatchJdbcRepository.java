@@ -29,7 +29,9 @@ public class MatchJdbcRepository implements MatchRepository {
         m.hero_url, m.date, m.win, m.is_party, p.id as player_id, p.id_dota as player_id_dota, p.nome, p.nick, p.avatar, p.is_private
         
         FROM matches m
-        INNER JOIN players p on m.player_id = p.id 
+        INNER JOIN players p on m.player_id = p.id
+        INNER JOIN season_players sp on sp.match_id = m.id
+        where sp.season_id = 2
         """;
 
     final String INSERT_MATCH = """
@@ -43,8 +45,14 @@ public class MatchJdbcRepository implements MatchRepository {
         """;
 
     final String FIND_MULTIPLE_PLAYERS_BY_MATCH = """
-        select id_dota, count(player_id) as quantity, win from matches where is_party = false 
-        and date > '2023-05-21 23:59:59.000000' group by id_dota, is_party, win having count(player_id) > 2;
+        select id_dota, count(m.player_id) as quantity, win from matches m
+                                                          inner join season_players sp on sp.match_id = m.id
+        where sp.season_id = 2 group by id_dota, is_party, win having count(m.player_id) > 1;
+        """;
+
+    final String UPDATE_MATCH_INFOS = """
+        UPDATE matches set hero_damage = :hero_damage , tower_damage = :tower_damage , hero_healing = :hero_healing , imp = :imp , award = :award 
+        WHERE id = :id
         """;
 
     @Override
@@ -139,6 +147,19 @@ public class MatchJdbcRepository implements MatchRepository {
 
             return matchQuantityPlayers;
         });
+    }
+
+    @Override
+    public void updateMatchInfos(Integer heroDamage, Integer towerDamage, Integer heroHealing, Integer imp, String award, Integer matchId) {
+        String query = UPDATE_MATCH_INFOS;
+        MapSqlParameterSource parameter = new MapSqlParameterSource();
+        parameter.addValue("hero_damage", heroDamage);
+        parameter.addValue("tower_damage", towerDamage);
+        parameter.addValue("hero_healing", heroHealing);
+        parameter.addValue("imp", imp);
+        parameter.addValue("award", award);
+        parameter.addValue("id", matchId);
+        namedParameterJdbcTemplate.update(query,parameter);
     }
 
     private Match rowMapper(ResultSet rs, int rowNum) throws SQLException {

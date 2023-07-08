@@ -1,5 +1,7 @@
 package com.b1house.dotaslz.controller;
 
+import com.b1house.dotaslz.ExternalApi.PlayerInfo;
+import com.b1house.dotaslz.ExternalApi.StratzServiceGraphQL;
 import com.b1house.dotaslz.model.Match;
 import com.b1house.dotaslz.service.MatchService;
 import org.springframework.http.ResponseEntity;
@@ -14,9 +16,11 @@ import java.util.List;
 @RequestMapping("/match")
 public class MatchController {
     private MatchService matchService;
+    private StratzServiceGraphQL stratzServiceGraphQL;
 
-    public MatchController(MatchService matchService){
+    public MatchController(MatchService matchService, StratzServiceGraphQL stratzServiceGraphQL){
         this.matchService = matchService;
+        this.stratzServiceGraphQL = stratzServiceGraphQL;
     }
 
 //    @GetMapping("/{idDota}")
@@ -37,5 +41,11 @@ public class MatchController {
     @GetMapping("/recent")
     ResponseEntity<List<Match>> getRecentMatches(){
         return ResponseEntity.ok(matchService.getRecentMatches());
+    }
+
+    @GetMapping("/test")
+    ResponseEntity<String> testGraphQL(){
+        stratzServiceGraphQL.saveMatchInfos();
+        return ResponseEntity.ok("done");
     }
 }
