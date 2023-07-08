@@ -30,8 +30,6 @@ public class MatchJdbcRepository implements MatchRepository {
         
         FROM matches m
         INNER JOIN players p on m.player_id = p.id
-        INNER JOIN season_players sp on sp.match_id = m.id
-        where sp.season_id = 2
         """;
 
     final String INSERT_MATCH = """
