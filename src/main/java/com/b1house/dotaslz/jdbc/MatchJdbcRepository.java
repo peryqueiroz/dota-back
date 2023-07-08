@@ -47,7 +47,7 @@ public class MatchJdbcRepository implements MatchRepository {
     final String FIND_MULTIPLE_PLAYERS_BY_MATCH = """
         select id_dota, count(m.player_id) as quantity, win from matches m
                                                           inner join season_players sp on sp.match_id = m.id
-        where sp.season_id = 2 group by id_dota, is_party, win having count(m.player_id) > 1;
+        where sp.season_id = :season_id group by id_dota, is_party, win having count(m.player_id) > 1;
         """;
 
     final String UPDATE_MATCH_INFOS = """
@@ -138,8 +138,11 @@ public class MatchJdbcRepository implements MatchRepository {
     }
 
     @Override
-    public List<MatchQuantityPlayers> findMultiplePlayersByMatch() {
-        return namedParameterJdbcTemplate.query(FIND_MULTIPLE_PLAYERS_BY_MATCH,(rs, rowNum) -> {
+    public List<MatchQuantityPlayers> findMultiplePlayersByMatch(Integer seasonId) {
+        MapSqlParameterSource parameter = new MapSqlParameterSource();
+        parameter.addValue("season_id", seasonId);
+
+        return namedParameterJdbcTemplate.query(FIND_MULTIPLE_PLAYERS_BY_MATCH, parameter,(rs, rowNum) -> {
             MatchQuantityPlayers matchQuantityPlayers = new MatchQuantityPlayers();
             matchQuantityPlayers.setIdDota(rs.getString("id_dota"));
             matchQuantityPlayers.setQuantity(rs.getInt("quantity"));

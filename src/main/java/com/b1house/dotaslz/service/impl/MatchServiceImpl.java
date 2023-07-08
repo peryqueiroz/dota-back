@@ -5,9 +5,11 @@ import com.b1house.dotaslz.dto.MatchQuantityPlayers;
 import com.b1house.dotaslz.enums.GameMode;
 import com.b1house.dotaslz.model.Match;
 import com.b1house.dotaslz.model.Player;
+import com.b1house.dotaslz.model.Season;
 import com.b1house.dotaslz.repository.MatchRepository;
 import com.b1house.dotaslz.service.MatchService;
 import com.b1house.dotaslz.service.PlayerService;
+import com.b1house.dotaslz.service.SeasonService;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -20,9 +22,12 @@ public class MatchServiceImpl implements MatchService {
     private MatchRepository matchRepository;
     private PlayerService playerService;
 
-    public MatchServiceImpl(MatchRepository matchRepository, PlayerService playerService){
+    private SeasonService seasonService;
+
+    public MatchServiceImpl(MatchRepository matchRepository, PlayerService playerService, SeasonService seasonService){
         this.matchRepository = matchRepository;
         this.playerService = playerService;
+        this.seasonService = seasonService;
     }
     @Override
     public Match getMatchByIdDota(Player player, String idDota) {
@@ -75,7 +80,13 @@ public class MatchServiceImpl implements MatchService {
 
     @Override
     public List<MatchQuantityPlayers> getMultiplePlayersByMatch() {
-        return matchRepository.findMultiplePlayersByMatch();
+        Season season = new Season();
+        try{
+            season =seasonService.getSeasonActivated();
+        } catch (Exception e){
+            return   Collections.emptyList();
+        }
+        return matchRepository.findMultiplePlayersByMatch(season.getId());
     }
 
     @Override

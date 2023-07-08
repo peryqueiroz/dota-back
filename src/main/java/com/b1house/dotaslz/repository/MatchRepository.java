@@ -22,7 +22,7 @@ public interface MatchRepository {
 
     List<Match> findRecentMatches();
 
-    List<MatchQuantityPlayers> findMultiplePlayersByMatch();
+    List<MatchQuantityPlayers> findMultiplePlayersByMatch(Integer seasonId);
 
     void updateMatchInfos(Integer heroDamage, Integer towerDamage, Integer heroHealing, Integer imp, String award, Integer matchId);
 

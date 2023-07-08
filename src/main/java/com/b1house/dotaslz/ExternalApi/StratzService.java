@@ -47,7 +47,7 @@ public class StratzService {
         this.seasonService = seasonService;
         this.achievementService = achievementService;
     }
-//    @Scheduled(fixedRate = 300000)
+    @Scheduled(fixedRate = 300000)
     public void scheduleFetchAndSaveNewMatches(){
         List<Player> players = playerService.getAllPlayers();
 
@@ -60,7 +60,7 @@ public class StratzService {
             }
         });
     }
-//    @Scheduled(fixedRate = 1860000)
+    @Scheduled(fixedRate = 1860000)
     public void scheduleFetchAndSaveInfoPlayers(){
         List<Player> players = playerService.getAllPlayers();
 
