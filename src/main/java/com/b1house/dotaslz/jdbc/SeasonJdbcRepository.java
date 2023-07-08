@@ -56,7 +56,6 @@ public class SeasonJdbcRepository implements SeasonRepository {
         try{
             return result(query,null);
         } catch (IncorrectResultSizeDataAccessException e){
-            System.out.println("More than one season activated returned on query - " + new Timestamp(System.currentTimeMillis()));
             throw new IncorrectResultSizeDataAccessException(1);
         }
 
