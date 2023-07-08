@@ -22,12 +22,9 @@ public class MatchServiceImpl implements MatchService {
     private MatchRepository matchRepository;
     private PlayerService playerService;
 
-    private SeasonService seasonService;
-
-    public MatchServiceImpl(MatchRepository matchRepository, PlayerService playerService, SeasonService seasonService){
+    public MatchServiceImpl(MatchRepository matchRepository, PlayerService playerService){
         this.matchRepository = matchRepository;
         this.playerService = playerService;
-        this.seasonService = seasonService;
     }
     @Override
     public Match getMatchByIdDota(Player player, String idDota) {
@@ -79,14 +76,8 @@ public class MatchServiceImpl implements MatchService {
     }
 
     @Override
-    public List<MatchQuantityPlayers> getMultiplePlayersByMatch() {
-        Season season = new Season();
-        try{
-            season =seasonService.getSeasonActivated();
-        } catch (Exception e){
-            return   Collections.emptyList();
-        }
-        return matchRepository.findMultiplePlayersByMatch(season.getId());
+    public List<MatchQuantityPlayers> getMultiplePlayersByMatch(Integer seasonId) {
+        return matchRepository.findMultiplePlayersByMatch(seasonId);
     }
 
     @Override
