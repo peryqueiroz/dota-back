@@ -6,6 +6,8 @@ public class PlayerInfo {
     private int heroHealing;
     private int imp;
     private String award;
+    private Boolean isParty;
+
 
     public int getHeroDamage() {
         return heroDamage;

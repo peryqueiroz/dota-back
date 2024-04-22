@@ -88,9 +88,9 @@ public class StratzService {
 
             String matchId = response.get(0).get("id").toString();
 
-            if (isNewMatch(player, matchId)) {
-
+            if (isGameRanked(player, response) && isNewMatch(player, matchId)) {
                 System.out.println(player.getNome() +" has a new match - "+ matchId);
+
                 Match match = fillMatchFromApiResponse(response, player);
                 Season season = new Season();
                 try{
@@ -108,7 +108,7 @@ public class StratzService {
                     System.out.println(match.getWin()? "Win" : "Loss");
 
                     updateScorePlayer(player, match, season);
-                    updateAchievement(player, match);
+//                    updateAchievement(player, match);
                 }
             }
         } catch (Exception e){
@@ -238,13 +238,24 @@ public class StratzService {
             return true;
         }
     }
+
+    private Boolean isGameRanked(Player player, List<HashMap> match){
+        if(Objects.equals(match.get(0).get("lobbyType").toString(), "7") && (Objects.equals(match.get(0).get("gameMode").toString(), "22"))){
+            return true;
+        } else {
+            System.out.println("Found not ranked match "+match.get(0).get("id") + " of "+ player.getNome());
+            return false;
+        }
+
+    }
+
     private Season getSeasonActivated(){
         return seasonService.getSeasonActivated();
     }
 
     private void updateScorePlayer(Player player, Match match, Season season){
-        GameMode gameMode = match.getIsParty() ? GameMode.PARTY : GameMode.SOLO;
-        Integer scoreFinal = match.getWin() ? gameMode.getScore() : (gameMode.getScore() * -1);
+//        GameMode gameMode = match.getIsParty() ? GameMode.PARTY : GameMode.SOLO;
+//        Integer scoreFinal = match.getWin() ? gameMode.getScore() : (gameMode.getScore() * -1);
 
         seasonService.saveScoreSeasonPlayer(player,season,match);
     }
