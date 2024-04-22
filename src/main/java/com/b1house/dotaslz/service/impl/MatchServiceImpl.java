@@ -39,19 +39,28 @@ public class MatchServiceImpl implements MatchService {
         players.forEach(player ->{
             MatchPlayers matchPlayers = new MatchPlayers();
             matchPlayers.setPlayer(player);
-            matchPlayers.setMatches(matchRepository.findRecentMatchByPlayer(player.getId()));
-            matches.add(matchPlayers);
-        });
+            try{
+                matchPlayers.setMatches(matchRepository.findRecentMatchByPlayer(player.getId()));
+                matches.add(matchPlayers);
+            } catch (Exception e){
+                System.out.println("Exception no findRecentMatch :"+ e.getMessage());
+            }
 
+        });
         List unmodifiableList = Collections.unmodifiableList(matches);
         List newList = new ArrayList(unmodifiableList);
-        Collections.sort(newList, new Comparator<MatchPlayers>() {
-            public int compare(MatchPlayers o1, MatchPlayers o2) {
-                if (o1.getMatches().get(0).getDate() == null || o2.getMatches().get(0).getDate()  == null)
-                    return 0;
-                return o2.getMatches().get(0).getDate().compareTo(o1.getMatches().get(0).getDate() );
-            }
-        });
+        try{
+            Collections.sort(newList, new Comparator<MatchPlayers>() {
+                public int compare(MatchPlayers o1, MatchPlayers o2) {
+                    if (o1.getMatches().get(0).getDate() == null || o2.getMatches().get(0).getDate()  == null)
+                        return 0;
+                    return o2.getMatches().get(0).getDate().compareTo(o1.getMatches().get(0).getDate() );
+                }
+            });
+        } catch (Exception e){
+            System.out.println("Error na comparação "+ e.getMessage());
+        }
+
         return newList;
     }
 
