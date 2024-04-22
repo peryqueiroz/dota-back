@@ -18,7 +18,7 @@ public class PlayerJdbcRepository implements PlayerRepository {
     }
 
     final String FIND_ALL_PLAYER = """
-        SELECT * FROM players WHERE is_main = true
+        SELECT * FROM players
         """;
 
     final String UPDATE_AVATAR = """
@@ -64,7 +64,7 @@ public class PlayerJdbcRepository implements PlayerRepository {
 
     @Override
     public List<Player> findAllPlayers() {
-        String query = FIND_ALL_PLAYER;
+        String query = " SELECT * FROM players WHERE is_main = true";
 
         return namedParameterJdbcTemplate.query(query, (rs, rowNum) -> {
             Player player = new Player();
