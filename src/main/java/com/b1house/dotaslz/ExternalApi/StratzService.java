@@ -143,8 +143,8 @@ public class StratzService {
             match.setHeroDamage(firstMatch.get("heroDamage").toString());
             match.setTowerDamage(firstMatch.get("towerDamage").toString());
             match.setHeroHealing(firstMatch.get("heroHealing").toString());
-            match.setImp(firstMatch.get("imp").toString());
             match.setAward(firstMatch.get("award").toString());
+            match.setImp(firstMatch.get("imp").toString());
         } catch (Exception e){
             System.out.println(e.getMessage());
         }

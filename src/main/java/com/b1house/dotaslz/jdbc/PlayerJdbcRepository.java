@@ -18,7 +18,7 @@ public class PlayerJdbcRepository implements PlayerRepository {
     }
 
     final String FIND_ALL_PLAYER = """
-        SELECT * FROM players 
+        SELECT * FROM players WHERE is_main = true
         """;
 
     final String UPDATE_AVATAR = """

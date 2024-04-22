@@ -20,7 +20,7 @@ public class ClassicMatchFinder {
         this.seasonService = seasonService;
     }
 
-    @Scheduled(fixedRate = 43200000)
+//    @Scheduled(fixedRate = 43200000)
     public void findMultiplePlayersByMatch(){
         System.out.println("Starting to search classic matches");
         Season season = new Season();

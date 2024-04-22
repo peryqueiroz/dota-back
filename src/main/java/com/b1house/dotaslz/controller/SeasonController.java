@@ -65,7 +65,7 @@ public class SeasonController {
             match.setId(idMatch);
 
             seasonService.saveScoreSeasonPlayer(player, season, match);
-            System.out.println("Saved match manually " + matchIdDota + "of "+ player.getNome());
+            System.out.println("Saved match manually " + matchIdDota + " of "+ player.getNome());
         } catch (Exception e){
             System.out.println(e.getMessage());
         }
