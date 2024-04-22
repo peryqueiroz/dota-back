@@ -139,12 +139,15 @@ public class StratzService {
         match.setKills(Integer.parseInt(firstMatch.get("numKills").toString()));
         match.setDeaths(Integer.parseInt(firstMatch.get("numDeaths").toString()));
         match.setAssists(Integer.parseInt(firstMatch.get("numAssists").toString()));
-
-        match.setHeroDamage(firstMatch.get("heroDamage").toString());
-        match.setTowerDamage(firstMatch.get("towerDamage").toString());
-        match.setHeroHealing(firstMatch.get("heroHealing").toString());
-        match.setImp(firstMatch.get("imp").toString());
-        match.setAward(firstMatch.get("award").toString());
+        try {
+            match.setHeroDamage(firstMatch.get("heroDamage").toString());
+            match.setTowerDamage(firstMatch.get("towerDamage").toString());
+            match.setHeroHealing(firstMatch.get("heroHealing").toString());
+            match.setImp(firstMatch.get("imp").toString());
+            match.setAward(firstMatch.get("award").toString());
+        } catch (Exception e){
+            System.out.println(e.getMessage());
+        }
 
         Boolean didRadiantWin = Boolean.parseBoolean(response.get(0).get("didRadiantWin").toString());
         Boolean isRadiant = Boolean.parseBoolean(firstMatch.get("isRadiant").toString());
