@@ -24,8 +24,16 @@ public class Match {
     private Boolean win;
     @Column("is_party")
     private Boolean isParty;
+    @Column("hero_damage")
+    private String heroDamage;
+    @Column("tower_damage")
+    private String towerDamage;
+    @Column("hero_healing")
+    private String heroHealing;
+    private String imp;
+    private String award;
 
-    public Match(Integer id, String idDota, Player player, Integer kills, Integer deaths, Integer assists, String heroUrl, LocalDateTime date, Boolean win, Boolean isParty) {
+    public Match(Integer id, String idDota, Player player, Integer kills, Integer deaths, Integer assists, String heroUrl, LocalDateTime date, Boolean win, Boolean isParty, String heroDamage, String towerDamage, String heroHealing, String imp, String award) {
         this.id = id;
         this.idDota = idDota;
         this.player = player;
@@ -36,6 +44,11 @@ public class Match {
         this.date = date;
         this.win = win;
         this.isParty = isParty;
+        this.heroDamage = heroDamage;
+        this.towerDamage = towerDamage;
+        this.heroHealing = heroHealing;
+        this.imp = imp;
+        this.award = award;
     }
 
     public Match() {
@@ -119,5 +132,45 @@ public class Match {
 
     public void setIsParty(Boolean isParty) {
         this.isParty = isParty;
+    }
+
+    public String getTowerDamage() {
+        return towerDamage;
+    }
+
+    public void setTowerDamage(String towerDamage) {
+        this.towerDamage = towerDamage;
+    }
+
+    public String getHeroDamage() {
+        return heroDamage;
+    }
+
+    public void setHeroDamage(String heroDamage) {
+        this.heroDamage = heroDamage;
+    }
+
+    public String getHeroHealing() {
+        return heroHealing;
+    }
+
+    public void setHeroHealing(String heroHealing) {
+        this.heroHealing = heroHealing;
+    }
+
+    public String getImp() {
+        return imp;
+    }
+
+    public void setImp(String imp) {
+        this.imp = imp;
+    }
+
+    public String getAward() {
+        return award;
+    }
+
+    public void setAward(String award) {
+        this.award = award;
     }
 }

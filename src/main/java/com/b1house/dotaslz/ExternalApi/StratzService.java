@@ -140,6 +140,12 @@ public class StratzService {
         match.setDeaths(Integer.parseInt(firstMatch.get("numDeaths").toString()));
         match.setAssists(Integer.parseInt(firstMatch.get("numAssists").toString()));
 
+        match.setHeroDamage(firstMatch.get("heroDamage").toString());
+        match.setTowerDamage(firstMatch.get("towerDamage").toString());
+        match.setHeroHealing(firstMatch.get("heroHealing").toString());
+        match.setImp(firstMatch.get("imp").toString());
+        match.setAward(firstMatch.get("award").toString());
+
         Boolean didRadiantWin = Boolean.parseBoolean(response.get(0).get("didRadiantWin").toString());
         Boolean isRadiant = Boolean.parseBoolean(firstMatch.get("isRadiant").toString());
         Boolean win = didRadiantWin == isRadiant;
@@ -164,7 +170,7 @@ public class StratzService {
     }
     private String getHeroUrlById(Integer id){
         String url = "https://api.stratz.com/api/v1/Hero";
-        String baseUrlReturn = "https://api.opendota.com/apps/dota2/images/heroes/";
+        String baseUrlReturn = "https://cdn.dota2.com/apps/dota2/images/heroes/";
 
         HttpHeaders headers = new HttpHeaders();
         headers.setBearerAuth(bearerToken);
@@ -243,7 +249,6 @@ public class StratzService {
         if(Objects.equals(match.get(0).get("lobbyType").toString(), "7") && (Objects.equals(match.get(0).get("gameMode").toString(), "22"))){
             return true;
         } else {
-            System.out.println("Found not ranked match "+match.get(0).get("id") + " of "+ player.getNome());
             return false;
         }
 

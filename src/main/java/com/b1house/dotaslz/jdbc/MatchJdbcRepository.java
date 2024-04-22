@@ -26,15 +26,15 @@ public class MatchJdbcRepository implements MatchRepository {
 
     final String FIND_MATCH = """
         SELECT m.id AS match_id, m.id_dota AS match_id_dota, m.kills, m.deaths, m.assists,
-        m.hero_url, m.date, m.win, m.is_party, p.id as player_id, p.id_dota as player_id_dota, p.nome, p.nick, p.avatar, p.is_private
+        m.hero_url, m.date, m.win, m.is_party, m.hero_damage, m.tower_damage, m.hero_healing, m.imp, m.award, p.id as player_id, p.id_dota as player_id_dota, p.nome, p.nick, p.avatar, p.is_private
         
         FROM matches m
         INNER JOIN players p on m.player_id = p.id
         """;
 
     final String INSERT_MATCH = """
-        INSERT INTO matches (id_dota, player_id, kills, deaths, assists, hero_url, date, win, is_party)
-        VALUES (:id_dota, :player_id, :kills, :deaths, :assists, :hero_url, :date, :win, :is_party)
+        INSERT INTO matches (id_dota, player_id, kills, deaths, assists, hero_url, date, win, is_party, hero_damage, tower_damage, hero_healing, imp, award)
+        VALUES (:id_dota, :player_id, :kills, :deaths, :assists, :hero_url, :date, :win, :is_party, :hero_damage, :tower_damage, :hero_healing, :imp, :award)
         """;
 
     final String UPDATE_GAME_MODE= """
@@ -82,6 +82,11 @@ public class MatchJdbcRepository implements MatchRepository {
             match.setHeroUrl(rs.getString("hero_url"));
             match.setWin(rs.getBoolean("win"));
             match.setIsParty(rs.getBoolean("is_party"));
+            match.setHeroDamage(rs.getString("hero_damage"));
+            match.setTowerDamage(rs.getString("tower_damage"));
+            match.setHeroHealing(rs.getString("hero_healing"));
+            match.setImp(rs.getString("imp"));
+            match.setAward(rs.getString("award"));
 
             Timestamp timestamp = rs.getTimestamp("date");
             match.setDate(timestamp.toLocalDateTime());
@@ -104,6 +109,11 @@ public class MatchJdbcRepository implements MatchRepository {
         parameter.addValue("date",match.getDate());
         parameter.addValue("win", match.getWin());
         parameter.addValue("is_party", match.getIsParty());
+        parameter.addValue("hero_damage", match.getHeroDamage());
+        parameter.addValue("tower_damage", match.getTowerDamage());
+        parameter.addValue("hero_healing", match.getHeroHealing());
+        parameter.addValue("imp", match.getImp());
+        parameter.addValue("award", match.getAward());
 
         namedParameterJdbcTemplate.update(query, parameter, generatedKeyHolder, new String[]{"id"});
 

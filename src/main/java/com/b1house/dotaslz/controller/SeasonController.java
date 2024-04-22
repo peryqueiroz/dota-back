@@ -60,10 +60,18 @@ public class SeasonController {
         match.setAssists(assists);
         match.setDeaths(deaths);
 
-        Integer idMatch = matchService.saveMatch(match);
-        match.setId(idMatch);
+        try{
+            Integer idMatch = matchService.saveMatch(match);
+            match.setId(idMatch);
 
-        seasonService.saveScoreSeasonPlayer(player, season, match);
+            seasonService.saveScoreSeasonPlayer(player, season, match);
+            System.out.println("Saved match manually " + matchIdDota + "of "+ player.getNome());
+        } catch (Exception e){
+            System.out.println(e.getMessage());
+        }
+
+
+        System.out.println();
 
         return ResponseEntity.ok().body("Match saved");
     }
