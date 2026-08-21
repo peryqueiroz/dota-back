@@ -1,21 +1,23 @@
 #!/bin/bash
-  echo "Parando o container atual..."
-  docker container stop $(docker ps -a -q)
 
-  echo "Deletando o container atual..."
-  docker container rm $(docker ps -a -q)
+echo "🚀 Iniciando deploy para Railway..."
 
-  echo "Atualizando main.."
-  git pull origin main
+# Verificar se o Railway CLI está instalado
+if ! command -v railway &> /dev/null; then
+    echo "❌ Railway CLI não encontrado. Instalando..."
+    npm install -g @railway/cli
+fi
 
-  echo "Buildando projeto ..."
-  ./gradlew build -x test
+# Login (se não estiver logado)
+railway login
 
-  echo "Buildando imagem docker do projeto  ..."
-  docker build -t dotaslz .
+# Build do projeto
+echo "📦 Buildando projeto..."
+./gradlew clean build -x test
 
-  echo "Rodando docker do projeto  ..."
-  docker run -p 8081:8081 -d dotaslz
+# Deploy
+echo "☁️ Fazendo deploy no Railway..."
+railway up
 
-  echo "Rodando logs do container  ..."
-  docker logs -f $(docker ps -a -q)
+echo "✅ Deploy concluído!"
+echo "🌐 URL: $(railway domain)"
